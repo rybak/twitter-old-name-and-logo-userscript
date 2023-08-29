@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Twitter: bring back old name and logo
 // @namespace    https://github.com/rybak
-// @version      5.1
+// @version      5.2
 // @description  Changes the tab icon, tab name, header logo, and naming of "tweets" on Twitter
 // @author       Andrei Rybak
 // @license      MIT
@@ -92,11 +92,13 @@
 
 	function createPostsSelector() {
 		// "Lights out" = dark theme
-		const darkThemeSelector = '.css-901oao.css-1hf3ou5.r-1bwzh9t.r-37j5jr.r-n6v787.r-16dba41.r-1cwl3u0.r-bcqeeo.r-qvutc0';
-		const dimThemeSelector = '.css-901oao.css-1hf3ou5.r-115tad6.r-37j5jr.r-n6v787.r-16dba41.r-1cwl3u0.r-bcqeeo.r-qvutc0';
+		// const darkThemeSelector   = '.css-901oao.css-1hf3ou5.r-1bwzh9t.r-37j5jr.r-n6v787.r-16dba41.r-1cwl3u0.r-bcqeeo.r-qvutc0';
+		// const dimThemeSelector    = '.css-901oao.css-1hf3ou5.r-115tad6.r-37j5jr.r-n6v787.r-16dba41.r-1cwl3u0.r-bcqeeo.r-qvutc0';
 		// "Default" = light theme
-		const lightThemeSelector = '.css-901oao.css-1hf3ou5.r-14j79pv.r-37j5jr.r-n6v787.r-16dba41.r-1cwl3u0.r-bcqeeo.r-qvutc0';
-		return `${darkThemeSelector}, ${dimThemeSelector}, ${lightThemeSelector}`;
+		// const lightThemeSelector  = '.css-901oao.css-1hf3ou5.r-14j79pv.r-37j5jr.r-n6v787.r-16dba41.r-1cwl3u0.r-bcqeeo.r-qvutc0';
+		// const mobilePostsSelector = '.css-901oao.css-1hf3ou5.r-1bwzh9t.r-37j5jr.r-n6v787.r-16dba41.r-1cwl3u0.r-bcqeeo.r-qvutc0';
+		//                                                     ^^^^^^^^^^
+		return '.css-901oao.css-1hf3ou5.r-37j5jr.r-n6v787.r-16dba41.r-1cwl3u0.r-bcqeeo.r-qvutc0';
 	}
 
 	/*
@@ -151,7 +153,7 @@
 				if (s.includes('tweets')) {
 					return;
 				}
-				const m = s.match('([0-9.K]+) posts');
+				const m = s.match('([0-9.,K]+) posts');
 				if (m == null) {
 					warn("Cannot match posts string", s);
 					return;
