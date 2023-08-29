@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Twitter: bring back old name and logo
 // @namespace    https://github.com/rybak
-// @version      5.2
+// @version      5.3
 // @description  Changes the tab icon, tab name, header logo, and naming of "tweets" on Twitter
 // @author       Andrei Rybak
 // @license      MIT
@@ -96,9 +96,17 @@
 		// const dimThemeSelector    = '.css-901oao.css-1hf3ou5.r-115tad6.r-37j5jr.r-n6v787.r-16dba41.r-1cwl3u0.r-bcqeeo.r-qvutc0';
 		// "Default" = light theme
 		// const lightThemeSelector  = '.css-901oao.css-1hf3ou5.r-14j79pv.r-37j5jr.r-n6v787.r-16dba41.r-1cwl3u0.r-bcqeeo.r-qvutc0';
-		// const mobilePostsSelector = '.css-901oao.css-1hf3ou5.r-1bwzh9t.r-37j5jr.r-n6v787.r-16dba41.r-1cwl3u0.r-bcqeeo.r-qvutc0';
 		//                                                     ^^^^^^^^^^
-		return '.css-901oao.css-1hf3ou5.r-37j5jr.r-n6v787.r-16dba41.r-1cwl3u0.r-bcqeeo.r-qvutc0';
+		const commonDesktopSelector = '.css-901oao.css-1hf3ou5.r-37j5jr.r-n6v787.r-16dba41.r-1cwl3u0.r-bcqeeo.r-qvutc0';
+
+		// const fakeMobileSelector = '.css-901oao.css-1hf3ou5.r-1bwzh9t.r-37j5jr.r-n6v787.r-16dba41.r-1cwl3u0.r-bcqeeo.r-qvutc0'; // "Lights out" in mobile emulation in desktop browser
+		// const darkMobileSelector = '.css-901oao.css-1hf3ou5.r-1bwzh9t.r-37j5jr.r-1b43r93.r-16dba41.r-14yzgew.r-bcqeeo.r-qvutc0'; // "Lights out" from Firefox Android
+		// const  dimMobileSelector = '.css-901oao.css-1hf3ou5.r-115tad6.r-37j5jr.r-1b43r93.r-16dba41.r-14yzgew.r-bcqeeo.r-qvutc0'; // "Dim" from Firefox Android
+		// const liteMobileSelector = '.css-901oao.css-1hf3ou5.r-14j79pv.r-37j5jr.r-1b43r93.r-16dba41.r-14yzgew.r-bcqeeo.r-qvutc0'; // "Default" from Firefox Android
+		//                                                    ^^^^^^^^^^
+
+		const commonMobileSelector = '.css-901oao.css-1hf3ou5.r-37j5jr.r-1b43r93.r-16dba41.r-14yzgew.r-bcqeeo.r-qvutc0';
+		return `${commonDesktopSelector}, ${commonMobileSelector}`;
 	}
 
 	/*
@@ -147,13 +155,23 @@
 	 * Replaces text "123 posts" with "123 tweets" on user profile pages.
 	 */
 	function renameTweets() {
+		/*
+		const allDivs = document.querySelectorAll('div');
+		for (const div of allDivs) {
+			if (div.innerHTML.endsWith('posts')) {
+				prompt('Classes ', div.classList);
+				return;
+			}
+		}
+		return;
+		*/
 		waitForElement(POSTS_SELECTOR).then(postsElement => {
 			try {
 				const s = postsElement.innerText;
 				if (s.includes('tweets')) {
 					return;
 				}
-				const m = s.match('([0-9.,K]+) posts');
+				const m = s.match('([0-9.,KMB]+) posts');
 				if (m == null) {
 					warn("Cannot match posts string", s);
 					return;
