@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         Twitter: bring back old name and logo
 // @namespace    https://github.com/rybak
-// @version      2.4
-// @description  Changes the tab icon, tab name, and header logo of Twitter pages back to the old version
+// @version      3
+// @description  Changes the tab icon, tab name, header logo, and naming of "tweets" on Twitter
 // @author       Andrei Rybak
 // @license      MIT
 // @match        https://twitter.com/*
@@ -39,6 +39,7 @@
 
 	const LOG_PREFIX = "[old school Twitter]";
 	const FAVICON_SELECTOR = 'link[rel="icon"], link[rel="shortcut icon"]';
+	const POSTS_SELECTOR = createPostsSelector();
 
 	function error(...toLog) {
 		console.error(LOG_PREFIX, ...toLog);
@@ -70,6 +71,15 @@
 				subtree: true
 			});
 		});
+	}
+
+	function createPostsSelector() {
+		// "Lights out" = dark theme
+		const darkThemeSelector = '.css-901oao.css-1hf3ou5.r-1bwzh9t.r-37j5jr.r-n6v787.r-16dba41.r-1cwl3u0.r-bcqeeo.r-qvutc0';
+		const dimThemeSelector = '.css-901oao.css-1hf3ou5.r-115tad6.r-37j5jr.r-n6v787.r-16dba41.r-1cwl3u0.r-bcqeeo.r-qvutc0';
+		// "Default" = light theme
+		const lightThemeSelector = '.css-901oao.css-1hf3ou5.r-14j79pv.r-37j5jr.r-n6v787.r-16dba41.r-1cwl3u0.r-bcqeeo.r-qvutc0';
+		return `${darkThemeSelector}, ${dimThemeSelector}, ${lightThemeSelector}`;
 	}
 
 	/*
@@ -114,26 +124,50 @@
 		}
 	}
 
-	function setUpTabRenamer() {
+	/*
+	 * Replaces text "123 posts" with "123 tweets" on user profile pages.
+	 */
+	function renameTweets() {
+		waitForElement(POSTS_SELECTOR).then(postsElement => {
+			try {
+				const s = postsElement.innerText;
+				const m = s.match('([0-9]+) posts');
+				if (m.length < 2) {
+					error("Cannot match posts string", s);
+					return;
+				}
+				postsElement.innerHTML = m[1] + " tweets";
+			} catch (e) {
+				error("Cannot rename posts to tweets", e);
+			}
+		});
+	}
+
+	function rename() {
+		replaceTabName();
+		renameTweets();
+	}
+
+	function setUpRenamer() {
 		let title = document.title;
 		const observer = new MutationObserver((mutationsList) => {
 			const maybeNewTitle = document.title;
 			if (maybeNewTitle != title) {
 				info('Title changed:', maybeNewTitle);
 				title = maybeNewTitle;
-				replaceTabName();
+				rename();
 			}
 		});
 		waitForElement('title').then(elem => {
 			observer.observe(elem, { subtree: true, characterData: true, childList: true });
 		});
-		replaceTabName();
+		rename();
 	}
 
-	replaceTabName();
+	rename();
 	waitForElement(FAVICON_SELECTOR).then(ignored => {
 		setFavicon(TWITTER_2012_ICON_URL);
 		replaceLogoInHeader();
-		setUpTabRenamer();
+		setUpRenamer();
 	});
 })();
