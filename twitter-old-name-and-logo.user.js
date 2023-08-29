@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Twitter: bring back old name and logo
 // @namespace    https://github.com/rybak
-// @version      5
+// @version      5.1
 // @description  Changes the tab icon, tab name, header logo, and naming of "tweets" on Twitter
 // @author       Andrei Rybak
 // @license      MIT
@@ -56,6 +56,10 @@
 
 	function error(...toLog) {
 		console.error(LOG_PREFIX, ...toLog);
+	}
+
+	function warn(...toLog) {
+		console.warn(LOG_PREFIX, ...toLog);
 	}
 
 	function info(...toLog) {
@@ -144,9 +148,12 @@
 		waitForElement(POSTS_SELECTOR).then(postsElement => {
 			try {
 				const s = postsElement.innerText;
-				const m = s.match('([0-9]+) posts');
+				if (s.includes('tweets')) {
+					return;
+				}
+				const m = s.match('([0-9.K]+) posts');
 				if (m == null) {
-					error("Cannot match posts string", s);
+					warn("Cannot match posts string", s);
 					return;
 				}
 				if (m.length < 2) {
