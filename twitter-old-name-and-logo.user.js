@@ -32,6 +32,19 @@
  * SOFTWARE.
  */
 
+/*
+ * Things which surprisingly don't need replacing/renaming as of 2023-08-14:
+ *
+ *   1. "Scheduled Tweets" are stilled called "Tweets"
+ *   2. <title> in single tweet pages is still "<username> on Twitter: ...", not "<username> on 𝕏: ..."
+ *
+ * Things deliberately left with the new name:
+ *
+ *   1. "Post" in "Post Analytics" -- a rarely used feature, don't care.
+ *   2. "X Corp." in the copyright line of the "footer" (it's in the right sidebar on the web version)
+ *   3. Anything on subdomains: about.twitter.com, developer.twitter.com, etc.
+ */
+
 (function() {
 	'use strict';
 
