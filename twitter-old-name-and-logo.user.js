@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Twitter: bring back old name and logo
 // @namespace    https://github.com/rybak
-// @version      2.3
+// @version      2.4
 // @description  Changes the tab icon, tab name, and header logo of Twitter pages back to the old version
 // @author       Andrei Rybak
 // @license      MIT
@@ -130,10 +130,10 @@
 		replaceTabName();
 	}
 
+	replaceTabName();
 	waitForElement(FAVICON_SELECTOR).then(ignored => {
 		setFavicon(TWITTER_2012_ICON_URL);
 		replaceLogoInHeader();
-		replaceTabName();
 		setUpTabRenamer();
 	});
 })();
