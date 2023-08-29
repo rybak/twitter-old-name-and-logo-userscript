@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Twitter: bring back old name and logo
 // @namespace    https://github.com/rybak
-// @version      2
+// @version      2.1
 // @description  Changes the tab icon, tab name, and header logo of Twitter pages back to the old version
 // @author       Andrei Rybak
 // @license      MIT
@@ -37,7 +37,7 @@
 
 	const TWITTER_2012_ICON_URL = 'https://abs.twimg.com/favicons/twitter.2.ico';
 
-	const LOG_PREFIX = "[Twitter icon]";
+	const LOG_PREFIX = "[old school Twitter]";
 	const FAVICON_SELECTOR = 'link[rel="icon"], link[rel="shortcut icon"]';
 
 	function error(...toLog) {
