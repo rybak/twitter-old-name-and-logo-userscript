@@ -3,7 +3,7 @@
 This userscript replaces logos and renames "tweets" in various parts of Twitter
 web UI.
 
-Install the userscript via [Greasy Fork][GreasyFork].
+See screenshots and install the userscript on [Greasy Fork][GreasyFork].
 
 [![Badge showing number of installs from Greasy Fork][GreasyForkInstallsBadge]][GreasyFork]
 
