@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Twitter: bring back old name and logo
 // @namespace    https://github.com/rybak
-// @version      13.1
+// @version      14
 // @description  Changes the logo, tab name, and naming of "tweets" on Twitter
 // @author       Andrei Rybak
 // @license      MIT
@@ -365,6 +365,14 @@
 		});
 	}
 
+	function renameRetweetTooltip() {
+		waitForElement('[data-testid="HoverLabel"] span').then(retweetTooltip => {
+			if (retweetTooltip.innerText == "Repost") {
+				retweetTooltip.innerText = "Retweet";
+			}
+		});
+	}
+
 	let retweetLinkObserver;
 
 	function renewRetweetLinkObserver() {
@@ -375,6 +383,7 @@
 			}
 			retweetLinkObserver = new MutationObserver(mutationsList => {
 				renameRetweetLink();
+				renameRetweetTooltip();
 			});
 			retweetLinkObserver.observe(retweetDropdownContainer, { subtree: true, childList: true });
 			info("Added retweetLinkObserver");
