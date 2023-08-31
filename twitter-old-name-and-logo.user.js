@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Twitter: bring back old name and logo
 // @namespace    https://github.com/rybak
-// @version      15.6
+// @version      16
 // @description  Changes the logo, tab name, and naming of "tweets" on Twitter
 // @author       Andrei Rybak
 // @license      MIT
@@ -34,7 +34,7 @@
  */
 
 /*
- * Things which surprisingly don't need replacing/renaming as of 2023-08-14:
+ * Things which surprisingly don't need replacing/renaming as of 2023-08-19:
  *
  *   1. "Scheduled Tweets" are still called "Tweets"
  *   2. Clickable link "Show <number> Tweets", when you have the timeline open for a while.
@@ -87,8 +87,8 @@
 			}
 			const observer = new MutationObserver(mutations => {
 				if (document.querySelector(selector)) {
-					resolve(document.querySelector(selector));
 					observer.disconnect();
+					resolve(document.querySelector(selector));
 				}
 			});
 
@@ -237,7 +237,10 @@
 	 */
 	function renameTweetButton() {
 		waitForElement('a[data-testid="SideNav_NewTweet_Button"] > div > span > div > div > span > span').then(tweetButton => {
-			tweetButton.innerHTML = "Tweet";
+			if (tweetButton.innerText == "Post") { // avoid renaming "Reply"
+				tweetButton.innerHTML = "Tweet";
+				debug("SideNav", tweetButton);
+			}
 		});
 		waitForElement(DIALOG_TWEET_BUTTON_SELECTOR).then(tweetButton => {
 			tweetButton.innerHTML = "Tweet";
@@ -253,6 +256,7 @@
 					newTweetButton.innerText = "Tweet all";
 				} else if (newTweetButton.innerText == "Post") {
 					newTweetButton.innerText = "Tweet";
+					debug("DIALOG_TWEET_BUTTON_SELECTOR", newTweetButton);
 				}
 			});
 			/*
@@ -275,6 +279,7 @@
 		waitForElement('div[data-testid="tweetButtonInline"] > div > span > span').then(tweetButton => {
 			// sometimes this button has the correct text "Reply"
 			if (tweetButton.innerText == "Post") {
+				debug("tweetButtonInline", tweetButton);
 				tweetButton.innerHTML = "Tweet";
 			}
 		});
@@ -309,13 +314,21 @@
 		});
 	}
 
-	function renameTweetYourReplyPlaceholder() {
-		// desktop
+	/*
+	 * Note: works only for desktop.
+	 */
+	function renameDraftEditorPlaceholder(targetText, replacementText, debugMessage) {
 		waitForElement('.public-DraftEditorPlaceholder-inner').then(placeholder => {
-			if (placeholder.innerText == "Post your reply!") {
-				placeholder.innerHTML = "Tweet your reply!";
+			if (placeholder.innerText == targetText) {
+				placeholder.innerHTML = replacementText;
+				debug("Renamed placeholder in", debugMessage);
 			}
 		});
+	}
+
+	function renameTweetYourReplyPlaceholder() {
+		// desktop
+		renameDraftEditorPlaceholder("Post your reply!", "Tweet your reply!", "renameTweetYourReplyPlaceholder");
 		// mobile
 		waitForElement('textarea[placeholder="Post your reply!"]').then(textarea => {
 			textarea.setAttribute('placeholder', "Tweet your reply!");
@@ -417,10 +430,15 @@
 		});
 	}
 
+	function renameAddAnotherTweetPlaceholder() {
+		renameDraftEditorPlaceholder("Add another post!", "Add another tweet!", "renameAddAnotherTweetPlaceholder");
+	}
+
 	let layersObserver;
 
 	/*
-	 * #layers is the element where tooltips and dropdown menues are shown.
+	 * #layers is the element where tooltips, dropdown menues, and
+	 * popup replies (as opposed to inline replies) are shown.
 	 */
 	function renewLayersObserver() {
 		waitForElement('#layers').then(retweetDropdownContainer => {
@@ -433,9 +451,30 @@
 				renameRetweetLink();
 				renameRetweetTooltip();
 				renameDropdownItems();
+				/*
+				 * There are both inline and popup "Reply" fields with placeholders.
+				 * This call to renameTweetYourReplyPlaceholder() takes care of the popups.
+				 * The call to renameTweetYourReplyPlaceholder() in rename()
+				 * takes care of the inline "Reply" fields.
+				 */
+				renameTweetYourReplyPlaceholder();
+				renameAddAnotherTweetPlaceholder();
 			});
 			layersObserver.observe(retweetDropdownContainer, { subtree: true, childList: true });
 			info("Added layersObserver");
+		});
+	}
+
+	function renameSeeTweetsPill() {
+		/*
+		 * Several types of "pills":
+		 *   - "X, Y, Z posted"
+		 *   - "See <number> new posts"
+		 */
+		waitForElement('[data-testid="pillLabel"] span span span.css-901oao.css-16my406.r-poiln3.r-bcqeeo.r-qvutc0').then(pill => {
+			if (pill.innerText == "posted") {
+				pill.innerHTML = "tweeted";
+			}
 		});
 	}
 
@@ -487,7 +526,10 @@
 		renameAddAnotherTweetButton();
 		renewRetweetedTimelineObserver();
 
+		// timeline + tweets on a timeline
 		renewLayersObserver();
+		renameSeeTweetsPill();
+
 		renewNotificationsObserver();
 	}
 
