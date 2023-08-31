@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Twitter: bring back old name and logo
 // @namespace    https://github.com/rybak
-// @version      20.4
+// @version      21
 // @description  Changes the logo, tab name, and naming of "tweets" on Twitter
 // @author       Andrei Rybak
 // @license      MIT
@@ -34,12 +34,10 @@
  */
 
 /*
- * Things which surprisingly don't need replacing/renaming as of 2023-08-23:
+ * Things which surprisingly don't need replacing/renaming as of 2023-08-26:
  *
  *   1. "Scheduled Tweets" are still called "Tweets"
- *   2. Clickable link "Show <number> Tweets", when you have the timeline open for a while.
- *   3. "Your Tweet was deleted" popup ("toast") message after deleting a tweet.
- *   4. "Based on your Retweets" in the "For you" tab.
+ *   2. "Based on your Retweets" in the "For you" tab. (not sure, needs rechecking)
  *
  * Things deliberately left with the new name:
  *
@@ -65,6 +63,7 @@
 	const POSTS_SELECTOR = createPostsSelector();
 	const DIALOG_TWEET_BUTTON_SELECTOR = 'div[data-testid="tweetButton"] > div > span > span';
 	const RETWEETED_SELECTOR = '[data-testid="socialContext"]';
+	const SHOW_N_TWEETS_SELECTOR = 'main div div section > div > div > div > div div[role="button"] > .css-1dbjc4n.r-16y2uox.r-1wbh5a2.r-1777fci > div > span';
 
 	function error(...toLog) {
 		console.error(LOG_PREFIX, ...toLog);
@@ -436,14 +435,41 @@
 		});
 	}
 
+	let showTweetsObserver;
+
+	/*
+	 * Clickable link at the top of the timeline.
+	 * "Show 42 tweets"
+	 */
+	function doRenameShowTweets() {
+		const showTweetsArray = document.querySelectorAll(SHOW_N_TWEETS_SELECTOR);
+		for (const showTweets of showTweetsArray) {
+			let t = showTweets.childNodes[0].textContent;
+			if (t.includes('posts')) {
+				if (showTweetsObserver != null) {
+					showTweetsObserver.disconnect();
+					showTweetsObserver = null;
+				}
+				t = t.replace('posts', 'tweets');
+				showTweets.childNodes[0].textContent = t;
+				info("doRenameShowTweets: Replaced", t);
+				showTweetsObserver = new MutationObserver(ignored => {
+					doRenameShowTweets();
+				});
+				showTweetsObserver.observe(showTweets, { characterData: true });
+				return;
+			}
+		}
+	}
+
 	let timelineObserver;
 
 	/*
-	 * Reconnects the observer for `doRenameRetweeted()` to the timeline node.
+	 * Reconnects the observer to the timeline node.
 	 * This is needed when the page changes completely and a new timeline
 	 * node appears in the DOM.
 	 */
-	function renewRetweetedTimelineObserver() {
+	function renewTimelineObserver() {
 		/*
 		 * Renaming "Jane Doe retweeted" when you know where these nodes are is easy.
 		 * That's the function `doRenameRetweeted()` above.  But keeping track of them
@@ -452,19 +478,24 @@
 		 *
 		 * The code below kinda works, but the user still sees "reposted" from time
 		 * to time.  Any suggestions for improvements are welcome.
+		 *
+		 * The selector for `section` needs to be so specific, because
+		 * switching between "For you" and "Following" creates several
+		 * `section` tags.
 		 */
-		const selector = 'section.css-1dbjc4n';
+		const selector = 'main section.css-1dbjc4n';
 		waitForElement(selector).then(timeline => {
 			if (timelineObserver != null) {
 				timelineObserver.disconnect();
-				info("Disconnected timeline observer for doRenameRetweeted()");
+				info("Disconnected timeline observer");
 			}
 			renameRetweetedGently();
 			timelineObserver = new MutationObserver(mutationsList => {
 				doRenameRetweeted();
+				doRenameShowTweets();
 			});
 			timelineObserver.observe(document.querySelector(selector), { subtree: true, childList: true });
-			info("Added timeline observer for doRenameRetweeted()");
+			info("Added timeline observer");
 		});
 		doRenameRetweeted();
 	}
@@ -681,11 +712,11 @@
 
 		// adding to your own thread
 		renameAddAnotherTweetButton();
-		renewRetweetedTimelineObserver();
 
 		// timeline + tweets on a timeline
 		renewLayersObserver();
 		renameSeeTweetsPill();
+		renewTimelineObserver();
 
 		renewNotificationsObserver();
 	}
