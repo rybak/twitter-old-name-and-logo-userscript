@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Twitter: bring back old name and logo
 // @namespace    https://github.com/rybak
-// @version      9.2
+// @version      10
 // @description  Changes the tab icon, tab name, header logo, and naming of "tweets" on Twitter
 // @author       Andrei Rybak
 // @license      MIT
@@ -287,8 +287,57 @@
 		});
 	}
 
+	function renameRetweeted() {
+		const allRetweeted = document.querySelectorAll('[data-testid="socialContext"]');
+		for (const retweeted of allRetweeted) {
+			if (retweeted.childNodes.length < 3) {
+				continue;
+			}
+			const retweetedText = retweeted.childNodes[2];
+			if (retweetedText.textContent == " reposted") {
+				retweetedText.remove();
+				retweeted.append(" retweeted");
+			}
+		}
+		info("Renamed fresh retweeted");
+	}
+
+	let timelineObserver;
+
+	/*
+	 * Reconnects the observer for `renameRetweeted()` to the timeline node.
+	 * This is needed when the page changes completely and a new timeline
+	 * node appears in the DOM.
+	 */
+	function renewRetweetedTimelineObserver() {
+		/*
+		 * Renaming "Jane Doe retweeted" when you know where these nodes are is easy.
+		 * That's the function `renameRetweeted()` above.  But keeping track of them
+		 * appearing in the timeline is difficult, if you also don't want to waste
+		 * CPU unnecessarily.
+		 *
+		 * The code below kinda works, but the user still sees "reposted" from time
+		 * to time.  Any suggestions for improvements are welcome.
+		 */
+		const selector = 'section.css-1dbjc4n';
+		waitForElement(selector).then(timeline => {
+			if (timelineObserver != null) {
+				timelineObserver.disconnect();
+				info("Disconnected timeline observer for renameRetweeted()");
+			}
+			renameRetweeted();
+			timelineObserver = new MutationObserver((mutationsList) => {
+				renameRetweeted();
+			});
+			timelineObserver.observe(document.querySelector(selector), { subtree: true, childList: true });
+			info("Added timeline observer for renameRetweeted()");
+			renameRetweeted();
+		});
+		renameRetweeted();
+	}
+
 	function rename() {
-		// "Tweet" button and tab's <title> are ubiquitous
+		// "Tweet" button, tab's <title>, and "Jane Doe retweeted" are ubiquitous
 		renameTweetButton();
 		replaceTabName();
 		// targets for renaming on a singular tweet page
@@ -299,11 +348,12 @@
 		renameProfileTweetsCounter();
 		// adding to your own thread
 		renameAddAnotherTweetButton();
+		renewRetweetedTimelineObserver();
 	}
 
 	function setUpRenamer() {
 		let title = document.title;
-		const observer = new MutationObserver((mutationsList) => {
+		const titleObserver = new MutationObserver((mutationsList) => {
 			const maybeNewTitle = document.title;
 			if (maybeNewTitle != title) {
 				info('Title changed:', maybeNewTitle);
@@ -312,7 +362,7 @@
 			}
 		});
 		waitForElement('title').then(elem => {
-			observer.observe(elem, { subtree: true, characterData: true, childList: true });
+			titleObserver.observe(elem, { subtree: true, characterData: true, childList: true });
 		});
 		rename();
 	}
