@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Twitter: bring back old name and logo
 // @namespace    https://github.com/rybak
-// @version      16.2
+// @version      16.3
 // @description  Changes the logo, tab name, and naming of "tweets" on Twitter
 // @author       Andrei Rybak
 // @license      MIT
@@ -225,6 +225,23 @@
 	}
 
 	/*
+	 * Renames existing "Tweet" buttons in popup dialogs on desktop.
+	 */
+	function doRenameDialogTweetButton() {
+						const newTweetButton = document.querySelector(DIALOG_TWEET_BUTTON_SELECTOR);
+				if (newTweetButton == null) {
+					return;
+				}
+				if (newTweetButton.innerText == "Post all") {
+					newTweetButton.innerText = "Tweet all";
+				} else if (newTweetButton.innerText == "Post") {
+					newTweetButton.innerText = "Tweet";
+					debug("DIALOG_TWEET_BUTTON_SELECTOR", newTweetButton);
+				}
+
+	}
+
+	/*
 	 * Button "Tweet" needs to change dynamically into "Tweet all" when
 	 * more than two tweets are added to the "draft".
 	 *
@@ -248,16 +265,7 @@
 				return;
 			}
 			tweetButtonObserver = new MutationObserver(mutations => {
-				const newTweetButton = document.querySelector(DIALOG_TWEET_BUTTON_SELECTOR);
-				if (newTweetButton == null) {
-					return;
-				}
-				if (newTweetButton.innerText == "Post all") {
-					newTweetButton.innerText = "Tweet all";
-				} else if (newTweetButton.innerText == "Post") {
-					newTweetButton.innerText = "Tweet";
-					debug("DIALOG_TWEET_BUTTON_SELECTOR", newTweetButton);
-				}
+				doRenameDialogTweetButton();
 			});
 			/*
 			 * Separate observer is needed to avoid leaking `tweetButtonObserver`
@@ -335,14 +343,15 @@
 		});
 	}
 
+	/*
+	 * Renames a given placeholder `targetText` with `replacementText`.
+	 * Works both on desktop (inline and popup dialogs) and on mobile.
+	 */
 	function renameTweetPlaceholders(targetText, replacementText, debugMessage) {
 		// desktop
-		renameDraftEditorPlaceholder(targetText, replacementText);
+		renameDraftEditorPlaceholder(targetText, replacementText, debugMessage);
 		// mobile
 		renameTextAreaAttributePlaceholder(targetText, replacementText);
-		waitForElement(`textarea[placeholder="${targetText}"]`).then(textarea => {
-			textarea.setAttribute('placeholder', replacementText);
-		});
 		/*
 		 * TODO: is there some way to detect desktop vs mobile?
 		 */
@@ -477,6 +486,7 @@
 				 */
 				renameTweetYourReplyPlaceholder();
 				renameAddAnotherTweetPlaceholder();
+				doRenameDialogTweetButton();
 			});
 			layersObserver.observe(retweetDropdownContainer, { subtree: true, childList: true });
 			info("Added layersObserver");
@@ -561,7 +571,7 @@
 			if (maybeNewTitle != title) {
 				info('Title changed:', maybeNewTitle);
 				title = maybeNewTitle;
-				if (!title.includes("Twitter")) {
+				if (!title.includes("Twitter") || title.endsWith("/ X")) {
 					info("Big renaming: starting...");
 					rename();
 					info("Big renaming: done ✅");
