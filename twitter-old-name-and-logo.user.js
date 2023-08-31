@@ -37,6 +37,7 @@
  * Things which surprisingly don't need replacing/renaming as of 2023-08-14:
  *
  *   1. "Scheduled Tweets" are still called "Tweets"
+ *   2. Clickable link "Show <number> Tweets", when you have the timeline open for a while.
  *
  * Things deliberately left with the new name:
  *
@@ -309,14 +310,19 @@
 	}
 
 	function renameTweetYourReplyPlaceholder() {
+		// desktop
 		waitForElement('.public-DraftEditorPlaceholder-inner').then(placeholder => {
 			if (placeholder.innerText == "Post your reply!") {
 				placeholder.innerHTML = "Tweet your reply!";
 			}
 		});
+		// mobile
 		waitForElement('textarea[placeholder="Post your reply!"]').then(textarea => {
 			textarea.setAttribute('placeholder', "Tweet your reply!");
 		});
+		/*
+		 * TODO: is there some way to detect desktop vs mobile?
+		 */
 	}
 
 	function renameRetweeted() {
