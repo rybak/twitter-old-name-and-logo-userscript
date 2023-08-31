@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Twitter: bring back old name and logo
 // @namespace    https://github.com/rybak
-// @version      16.9
+// @version      17
 // @description  Changes the logo, tab name, and naming of "tweets" on Twitter
 // @author       Andrei Rybak
 // @license      MIT
@@ -321,9 +321,14 @@
 	 * Renames the header on a page for a singular tweet.
 	 */
 	function renameTweetHeader() {
+		/*
+		 * Using selector `#layers h2 ...` works on desktop, but doesn't work on mobile.
+		 */
 		waitForElement('h2 > .css-901oao.css-16my406.r-poiln3.r-bcqeeo.r-qvutc0').then(tweetHeader => {
 			if (tweetHeader.innerText == "Post") {
 				tweetHeader.innerHTML = "Tweet";
+			} else if (tweetHeader.innerText == "Reposted by") {
+				tweetHeader.innerHTML = "Retweeted by";
 			}
 		});
 	}
@@ -421,7 +426,7 @@
 				info("Disconnected timeline observer for doRenameRetweeted()");
 			}
 			renameRetweetedGently();
-			timelineObserver = new MutationObserver((mutationsList) => {
+			timelineObserver = new MutationObserver(mutationsList => {
 				doRenameRetweeted();
 			});
 			timelineObserver.observe(document.querySelector(selector), { subtree: true, childList: true });
@@ -477,6 +482,14 @@
 		renameTweetPlaceholders("Add another post!", "Add another tweet!", "renameAddAnotherTweetPlaceholder");
 	}
 
+	function renameRetweetedByPopupHeader() {
+		waitForElement('#layers h2 > .css-901oao.css-16my406.r-poiln3.r-bcqeeo.r-qvutc0').then(tweetHeader => {
+			if (tweetHeader.innerText == "Reposted by") {
+				tweetHeader.innerHTML = "Retweeted by";
+			}
+		});
+	}
+
 	let layersObserver;
 
 	/*
@@ -503,6 +516,7 @@
 				renameTweetYourReplyPlaceholder();
 				renameAddAnotherTweetPlaceholder();
 				doRenameDialogTweetButton();
+				renameRetweetedByPopupHeader();
 			});
 			layersObserver.observe(retweetDropdownContainer, { subtree: true, childList: true });
 			info("Added layersObserver");
@@ -616,7 +630,7 @@
 
 	function setUpRenamer() {
 		let title = document.title;
-		const titleObserver = new MutationObserver((mutationsList) => {
+		const titleObserver = new MutationObserver(mutationsList => {
 			const maybeNewTitle = document.title;
 			if (maybeNewTitle != title) {
 				info('Title changed:', maybeNewTitle);
