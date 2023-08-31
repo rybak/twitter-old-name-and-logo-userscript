@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Twitter: bring back old name and logo
 // @namespace    https://github.com/rybak
-// @version      11.1
+// @version      12
 // @description  Changes the tab icon, tab name, header logo, and naming of "tweets" on Twitter
 // @author       Andrei Rybak
 // @license      MIT
@@ -360,6 +360,37 @@
 		});
 	}
 
+	let notificationsObserver;
+
+	function renameTweetNotifications() {
+		if (document.location.pathname != '/notifications') {
+			if (notificationsObserver != null) {
+				notificationsObserver.disconnect();
+				info("Disconnected notificationsObserver");
+			}
+			return;
+		}
+		waitForElement('[aria-label="Timeline: Notifications"]').then(notificationsContainer => {
+			notificationsObserver = new MutationObserver(mutationsList => {
+				/*
+				 * This mess of a selector tries to minimize the amount of `spanNodes` that match.
+				 */
+				const spanNodes = document.querySelectorAll('article div.css-901oao.r-1nao33i.r-37j5jr.r-a023e6.r-16dba41.r-rjixqe.r-bcqeeo.r-1udh08x.r-qvutc0 span span.css-901oao.css-16my406.r-poiln3.r-bcqeeo.r-qvutc0');
+				spanNodes.forEach(spanNode => {
+					debug(spanNode.innerText);
+					if (spanNode.innerText.includes("post")) {
+						let s = spanNode.innerText;
+						s = s.replaceAll(" repost", " retweet");
+						s = s.replaceAll(" post", " tweet");
+						spanNode.innerText = s;
+					}
+				});
+			});
+			notificationsObserver.observe(notificationsContainer, { subtree: true, childList: true });
+			info("Added notificationsObserver");
+		});
+	}
+
 	function rename() {
 		// "Tweet" button and tab's <title> are ubiquitous
 		renameTweetButton();
@@ -375,6 +406,7 @@
 		renewRetweetedTimelineObserver();
 
 		renewRetweetLinkObserver();
+		renameTweetNotifications();
 	}
 
 	function setUpRenamer() {
