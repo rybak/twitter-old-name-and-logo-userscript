@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Twitter: bring back old name and logo
 // @namespace    https://github.com/rybak
-// @version      16
+// @version      16.1
 // @description  Changes the logo, tab name, and naming of "tweets" on Twitter
 // @author       Andrei Rybak
 // @license      MIT
@@ -79,7 +79,7 @@
 		console.debug(LOG_PREFIX, ...toLog);
 	}
 
-	// from https://stackoverflow.com/a/61511955/1083697 by Yong Wang
+	// adapted from https://stackoverflow.com/a/61511955/1083697 by Yong Wang
 	function waitForElement(selector) {
 		return new Promise(resolve => {
 			if (document.querySelector(selector)) {
@@ -326,13 +326,20 @@
 		});
 	}
 
+	/*
+	 * Note: works only for mobile.
+	 */
+	function renameTextAreaAttributePlaceholder(targetText, replacementText) {
+		waitForElement(`textarea[placeholder="${targetText}"]`).then(textarea => {
+			textarea.setAttribute('placeholder', replacementText);
+		});
+	}
+
 	function renameTweetYourReplyPlaceholder() {
 		// desktop
 		renameDraftEditorPlaceholder("Post your reply!", "Tweet your reply!", "renameTweetYourReplyPlaceholder");
 		// mobile
-		waitForElement('textarea[placeholder="Post your reply!"]').then(textarea => {
-			textarea.setAttribute('placeholder', "Tweet your reply!");
-		});
+		renameTextAreaAttributePlaceholder("Post your reply!", "Tweet your reply!");
 		/*
 		 * TODO: is there some way to detect desktop vs mobile?
 		 */
@@ -431,7 +438,10 @@
 	}
 
 	function renameAddAnotherTweetPlaceholder() {
-		renameDraftEditorPlaceholder("Add another post!", "Add another tweet!", "renameAddAnotherTweetPlaceholder");
+		const targetText = "Add another post!";
+		const replacementText = "Add another tweet!";
+		renameDraftEditorPlaceholder(targetText, replacementText, "renameAddAnotherTweetPlaceholder");
+		renameTextAreaAttributePlaceholder(targetText, replacementText);
 	}
 
 	let layersObserver;
