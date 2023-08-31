@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Twitter: bring back old name and logo
 // @namespace    https://github.com/rybak
-// @version      6
+// @version      7
 // @description  Changes the tab icon, tab name, header logo, and naming of "tweets" on Twitter
 // @author       Andrei Rybak
 // @license      MIT
@@ -53,6 +53,7 @@
 	const LOG_PREFIX = "[old school Twitter]";
 	const FAVICON_SELECTOR = 'link[rel="icon"], link[rel="shortcut icon"]';
 	const POSTS_SELECTOR = createPostsSelector();
+	const DIALOG_TWEET_BUTTON_SELECTOR = 'div[data-testid="tweetButton"] > div > span > span';
 
 	function error(...toLog) {
 		console.error(LOG_PREFIX, ...toLog);
@@ -188,15 +189,44 @@
 		});
 	}
 
+	/*
+	 * Button "Tweet" needs to change dynamically into "Tweet all".
+	 * Do it via a separate observer for its text.
+	 */
+	let tweetButtonObserver = null;
+
 	function renameTweetButton() {
 		waitForElement('a[data-testid="SideNav_NewTweet_Button"] > div > span > div > div > span > span').then(tweetButton => {
 			tweetButton.innerHTML = "Tweet";
 		});
-		waitForElement('div[data-testid="tweetButton"] > div > span > span').then(tweetButton => {
-			tweetButton.innerHTML = "Tweet";
-		});
 		waitForElement('div[data-testid="tweetButtonInline"] > div > span > span').then(tweetButton => {
 			tweetButton.innerHTML = "Tweet";
+		});
+		waitForElement(DIALOG_TWEET_BUTTON_SELECTOR).then(tweetButton => {
+			tweetButton.innerHTML = "Tweet";
+			if (tweetButtonObserver != null) {
+				return;
+			}
+			tweetButtonObserver = new MutationObserver(mutations => {
+				waitForElement(DIALOG_TWEET_BUTTON_SELECTOR).then(newTweetButton => {
+					if (newTweetButton.innerText == "Post all") {
+						newTweetButton.innerText = "Tweet all";
+					} else if (newTweetButton.innerText == "Post") {
+						newTweetButton.innerText = "Tweet";
+					}
+				});
+			});
+			const dialogObserver = new MutationObserver(mutations => {
+				if (document.querySelector('[role="dialog"]') == null) {
+					tweetButtonObserver.disconnect();
+					tweetButtonObserver = null;
+					info("Disconnected tweetButtonObserver");
+					dialogObserver.disconnect();
+				}
+			});
+			tweetButtonObserver.observe(document.querySelector('[role="dialog"]'), { childList: true, subtree: true });
+			info("Connected tweetButtonObserver");
+			dialogObserver.observe(document.body, { childList: true, subtree: true });
 		});
 	}
 
