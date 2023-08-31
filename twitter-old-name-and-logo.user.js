@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Twitter: bring back old name and logo
 // @namespace    https://github.com/rybak
-// @version      18.1
+// @version      19
 // @description  Changes the logo, tab name, and naming of "tweets" on Twitter
 // @author       Andrei Rybak
 // @license      MIT
@@ -225,6 +225,14 @@
 				postsElement.innerHTML = m[1] + " tweets";
 			} catch (e) {
 				error("Cannot rename posts to tweets", e);
+			}
+		});
+	}
+
+	function renameNavTabTweets() {
+		waitForElement('main nav [data-testid="ScrollSnap-List"] > div:first-child span').then(tweetsTabName => {
+			if (tweetsTabName.innerText == "Posts") {
+				tweetsTabName.innerHTML = "Tweets";
 			}
 		});
 	}
@@ -631,8 +639,9 @@
 		renameRetweetsCounter();
 		renameTweetYourReplyPlaceholder();
 
-		// target for renaming on a user's profile
+		// targets for renaming on a user's profile
 		renameProfileTweetsCounter();
+		renameNavTabTweets();
 
 		// adding to your own thread
 		renameAddAnotherTweetButton();
