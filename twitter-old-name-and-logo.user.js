@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Twitter: bring back old name and logo
 // @namespace    https://github.com/rybak
-// @version      18
+// @version      18.1
 // @description  Changes the logo, tab name, and naming of "tweets" on Twitter
 // @author       Andrei Rybak
 // @license      MIT
@@ -454,6 +454,9 @@
 			if (retweetTooltip.innerText == "Repost") {
 				retweetTooltip.innerText = "Retweet";
 				debug("Renamed 'Retweet' in renameRetweetTooltip");
+			} else if (retweetTooltip.innerText == "Undo repost") {
+				retweetTooltip.innerText = "Undo retweet";
+				debug("Renamed 'Undo retweet' in renameRetweetTooltip");
 			}
 		});
 	}
