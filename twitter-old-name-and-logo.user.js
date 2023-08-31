@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Twitter: bring back old name and logo
 // @namespace    https://github.com/rybak
-// @version      15.3
+// @version      15.4
 // @description  Changes the logo, tab name, and naming of "tweets" on Twitter
 // @author       Andrei Rybak
 // @license      MIT
@@ -170,13 +170,18 @@
 	}
 
 	function replaceTabName() {
-		const t = document.title;
+		let t = document.title;
 		if (t == "X") {
-			document.title = "Twitter";
-		} else if (t.endsWith("/ X")) {
-			document.title = t.replace("/ X", "/ Twitter");
-		} else if (t.includes(" on X: ")) {
-			document.title = t.replace(" on X: ", " on Twitter: ");
+			t = "Twitter";
+		}
+		if (t.endsWith("/ X")) {
+			t = t.replace("/ X", "/ Twitter");
+		}
+		if (t.includes(" on X: ")) {
+			t = t.replace(" on X: ", " on Twitter: ");
+		}
+		if (t != document.title) {
+			document.title = t;
 		}
 	}
 
@@ -387,6 +392,9 @@
 		// Desktop: [data-testid="Dropdown"]
 		// Mobile : [data-testid="sheetDialog"]
 		waitForElement('#layers [role="menu"]').then(dropdown => {
+			/*
+			 * TODO: on desktop, this gets called twice, unfortunately.
+			 */
 			dropdown.querySelectorAll('span.css-901oao.css-16my406.r-poiln3.r-bcqeeo.r-qvutc0').forEach(span => {
 				if (span.innerText.includes("post")) {
 					span.innerHTML = span.innerText.replace("post", "tweet");
