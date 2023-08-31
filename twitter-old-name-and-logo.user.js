@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Twitter: bring back old name and logo
 // @namespace    https://github.com/rybak
-// @version      14
+// @version      15
 // @description  Changes the logo, tab name, and naming of "tweets" on Twitter
 // @author       Andrei Rybak
 // @license      MIT
@@ -361,6 +361,7 @@
 		waitForElement('[data-testid="retweetConfirm"] span.css-901oao.css-16my406.r-poiln3.r-bcqeeo.r-qvutc0').then(retweetLink => {
 			if (retweetLink.innerText == "Repost") {
 				retweetLink.innerHTML = "Retweet";
+				debug("Renamed 'Retweet' in renameRetweetLink");
 			}
 		});
 	}
@@ -373,20 +374,41 @@
 		});
 	}
 
-	let retweetLinkObserver;
+	/*
+	 * There are at least two affected dropdowns:
+	 *   1. "More" under the three dots button in the top right of a tweet
+	 *   2. "Share" under the button with "Send" icon (desktop) or
+	 *      "Share" icon (mobile) in the bottom right of a tweet.
+	 */
+	function renameDropdownItems() {
+		waitForElement('[data-testid="Dropdown"]').then(dropdown => {
+			dropdown.querySelectorAll('span.css-901oao.css-16my406.r-poiln3.r-bcqeeo.r-qvutc0').forEach(span => {
+				if (span.innerText.includes("post")) {
+					span.innerHTML = span.innerText.replace("post", "tweet");
+					debug("Renamed 'tweet' in renameDropdownItems");
+				}
+			});
+		});
+	}
 
-	function renewRetweetLinkObserver() {
+	let layersObserver;
+
+	/*
+	 * #layers is the element where tooltips and dropdown menues are shown.
+	 */
+	function renewLayersObserver() {
 		waitForElement('#layers').then(retweetDropdownContainer => {
-			if (retweetLinkObserver != null) {
-				retweetLinkObserver.disconnect();
-				retweetLinkObserver = null;
+			if (layersObserver != null) {
+				layersObserver.disconnect();
+				layersObserver = null;
 			}
-			retweetLinkObserver = new MutationObserver(mutationsList => {
+			layersObserver = new MutationObserver(mutationsList => {
 				renameRetweetLink();
 				renameRetweetTooltip();
+				renameDropdownItems();
 			});
-			retweetLinkObserver.observe(retweetDropdownContainer, { subtree: true, childList: true });
-			info("Added retweetLinkObserver");
+			layersObserver.observe(retweetDropdownContainer, { subtree: true, childList: true });
+			info("Added layersObserver");
 		});
 	}
 
@@ -435,7 +457,7 @@
 		renameAddAnotherTweetButton();
 		renewRetweetedTimelineObserver();
 
-		renewRetweetLinkObserver();
+		renewLayersObserver();
 		renameTweetNotifications();
 	}
 
