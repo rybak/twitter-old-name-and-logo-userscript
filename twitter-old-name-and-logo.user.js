@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Twitter: bring back old name and logo
 // @namespace    https://github.com/rybak
-// @version      19
+// @version      20
 // @description  Changes the logo, tab name, and naming of "tweets" on Twitter
 // @author       Andrei Rybak
 // @license      MIT
@@ -34,12 +34,12 @@
  */
 
 /*
- * Things which surprisingly don't need replacing/renaming as of 2023-08-21:
+ * Things which surprisingly don't need replacing/renaming as of 2023-08-23:
  *
  *   1. "Scheduled Tweets" are still called "Tweets"
  *   2. Clickable link "Show <number> Tweets", when you have the timeline open for a while.
- *   3. Header "Delete Tweet?" in the popup when deleting a tweet.
- *   4. "Your Tweet was deleted" popup ("toast") message after deleting at tweet.
+ *   3. "Your Tweet was deleted" popup ("toast") message after deleting at tweet.
+ *   4. "Based on your Retweets" in the "For you" tab.
  *
  * Things deliberately left with the new name:
  *
@@ -317,6 +317,17 @@
 	}
 
 	/*
+	 * Renames counter "Quotes" → "Quote Tweets" on an individual tweet's page.
+	 * A bunch of old screenshots for confirmation:
+	 *     https://danieljmitchell.wordpress.com/2020/12/29/2020s-tweet-of-the-year/
+	 */
+	function renameQuoteTweetsCounter() {
+		waitForElement('a[href$="/retweets/with_comments"] > span > span').then(retweetsCounterElement => {
+			retweetsCounterElement.innerHTML = "Quote Tweets";
+		});
+	}
+
+	/*
 	 * Renames "Add another tweet" button (for continuing your own existing thread).
 	 */
 	function renameAddAnotherTweetButton() {
@@ -339,6 +350,12 @@
 				tweetHeader.innerHTML = "Tweet";
 			} else if (tweetHeader.innerText == "Reposted by") {
 				tweetHeader.innerHTML = "Retweeted by";
+			} else if (tweetHeader.innerText == "Quotes") {
+				/*
+				 * Source, confirming that they were indeed called that:
+				 * https://www.macrumors.com/2020/08/31/twitter-quote-tweets-feature/
+				 */
+				tweetHeader.innerHTML = "Quote Tweets";
 			}
 		});
 	}
@@ -503,13 +520,23 @@
 		});
 	}
 
-	function renameYourTweetWasSent() {
+	function doRenameYourTweetWasSent() {
 		const maybeToast = document.querySelector('#layers [data-testid="toast"] > div > span');
 		if (maybeToast) {
 			const t = maybeToast.innerText;
 			if (t.includes(' post ')) {
 				maybeToast.innerHTML = t.replace(' post ', ' tweet ');
-				debug("renameYourTweetWasSent", t);
+				debug("doRenameYourTweetWasSent", t);
+			}
+		}
+	}
+
+	function doRenameDeletePostQuestion() {
+		const maybeHeader = document.querySelector('#layers [data-testid="confirmationSheetDialog"] > h1');
+		if (maybeHeader) {
+			if (maybeHeader.innerText == "Delete post?") {
+				maybeHeader.innerHTML = "Delete tweet?";
+				debug("doRenameDeletePostQuestion");
 			}
 		}
 	}
@@ -541,7 +568,8 @@
 				renameAddAnotherTweetPlaceholder();
 				doRenameDialogTweetButton();
 				renameRetweetedByPopupHeader();
-				renameYourTweetWasSent();
+				doRenameYourTweetWasSent();
+				doRenameDeletePostQuestion();
 			});
 			layersObserver.observe(retweetDropdownContainer, { subtree: true, childList: true });
 			info("Added layersObserver");
@@ -637,6 +665,7 @@
 		// targets for renaming on a singular tweet page
 		renameTweetHeader();
 		renameRetweetsCounter();
+		renameQuoteTweetsCounter();
 		renameTweetYourReplyPlaceholder();
 
 		// targets for renaming on a user's profile
