@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Twitter: bring back old name and logo
 // @namespace    https://github.com/rybak
-// @version      21
+// @version      21.1
 // @description  Changes the logo, tab name, and naming of "tweets" on Twitter
 // @author       Andrei Rybak
 // @license      MIT
@@ -441,7 +441,7 @@
 	 * Clickable link at the top of the timeline.
 	 * "Show 42 tweets"
 	 */
-	function doRenameShowTweets() {
+	function renameShowTweets() {
 		const showTweetsArray = document.querySelectorAll(SHOW_N_TWEETS_SELECTOR);
 		for (const showTweets of showTweetsArray) {
 			let t = showTweets.childNodes[0].textContent;
@@ -452,9 +452,9 @@
 				}
 				t = t.replace('posts', 'tweets');
 				showTweets.childNodes[0].textContent = t;
-				info("doRenameShowTweets: Replaced", t);
+				info("doRenameShowTweets: replaced", t);
 				showTweetsObserver = new MutationObserver(ignored => {
-					doRenameShowTweets();
+					renameShowTweets();
 				});
 				showTweetsObserver.observe(showTweets, { characterData: true });
 				return;
@@ -487,15 +487,24 @@
 		waitForElement(selector).then(timeline => {
 			if (timelineObserver != null) {
 				timelineObserver.disconnect();
+				timelineObserver = null;
 				info("Disconnected timeline observer");
 			}
 			renameRetweetedGently();
+			renameShowTweets();
 			timelineObserver = new MutationObserver(mutationsList => {
 				doRenameRetweeted();
-				doRenameShowTweets();
+				renameShowTweets();
 			});
-			timelineObserver.observe(document.querySelector(selector), { subtree: true, childList: true });
-			info("Added timeline observer");
+			/*
+			 * Argh. Don't know of a good way to switch the observer
+			 * between tags in "For you" and in "Following" tabs.
+			 */
+			const allSections = document.querySelectorAll(selector);
+			for (const section of allSections) {
+				timelineObserver.observe(section, { subtree: true, childList: true, characterData: true });
+				info("Added timeline observer", section);
+			}
 		});
 		doRenameRetweeted();
 	}
