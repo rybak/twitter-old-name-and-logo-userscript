@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Twitter: bring back old name and logo
 // @namespace    https://github.com/rybak
-// @version      11
+// @version      11.1
 // @description  Changes the tab icon, tab name, header logo, and naming of "tweets" on Twitter
 // @author       Andrei Rybak
 // @license      MIT
@@ -356,8 +356,8 @@
 				renameRetweetLink();
 			});
 			retweetLinkObserver.observe(retweetDropdownContainer, { subtree: true, childList: true });
+			info("Added retweetLinkObserver");
 		});
-		info("Added retweetLinkObserver");
 	}
 
 	function rename() {
