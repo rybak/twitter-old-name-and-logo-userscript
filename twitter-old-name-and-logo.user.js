@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Twitter: bring back old name and logo
 // @namespace    https://github.com/rybak
-// @version      5.3
+// @version      6
 // @description  Changes the tab icon, tab name, header logo, and naming of "tweets" on Twitter
 // @author       Andrei Rybak
 // @license      MIT
@@ -156,6 +156,7 @@
 	 */
 	function renameTweets() {
 		/*
+		// Debug code for figuring out CSS selectors for mobile version
 		const allDivs = document.querySelectorAll('div');
 		for (const div of allDivs) {
 			if (div.innerHTML.endsWith('posts')) {
@@ -205,11 +206,18 @@
 		});
 	}
 
+	function renameAddAnotherTweetButton() {
+		waitForElement('main section .css-901oao.css-16my406.css-1hf3ou5.r-poiln3.r-1b43r93.r-1cwl3u0.r-bcqeeo.r-qvutc0 .css-901oao.css-16my406.r-poiln3.r-bcqeeo.r-qvutc0').then(addAnotherTweetButton => {
+			addAnotherTweetButton.innerHTML = "Add another tweet";
+		});
+	}
+
 	function rename() {
 		replaceTabName();
 		renameTweets();
 		renameTweetButton();
 		renameRetweetsCounter();
+		renameAddAnotherTweetButton();
 	}
 
 	function setUpRenamer() {
