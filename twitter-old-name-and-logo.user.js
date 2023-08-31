@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Twitter: bring back old name and logo
 // @namespace    https://github.com/rybak
-// @version      15.5
+// @version      15.6
 // @description  Changes the logo, tab name, and naming of "tweets" on Twitter
 // @author       Andrei Rybak
 // @license      MIT
@@ -43,6 +43,7 @@
  *   1. "Post" in "Post Analytics" -- a rarely used feature, don't care.
  *   2. "X Corp." in the copyright line of the "footer" (it's in the right sidebar on the web version)
  *   3. Anything on subdomains: about.twitter.com, developer.twitter.com, etc.
+ *   4. Tweets counters in "What's happening". It's algorithmic trash, hide it with https://userstyles.world/style/10864/twitter-hide-trends-and-who-to-follow
  */
 
 (function() {
@@ -313,6 +314,9 @@
 				placeholder.innerHTML = "Tweet your reply!";
 			}
 		});
+		waitForElement('textarea[placeholder="Post your reply!"]').then(textarea => {
+			textarea.setAttribute('placeholder', "Tweet your reply!");
+		});
 	}
 
 	function renameRetweeted() {
@@ -366,6 +370,9 @@
 
 	function renameRetweetLink() {
 		waitForElement('[data-testid="retweetConfirm"] span.css-901oao.css-16my406.r-poiln3.r-bcqeeo.r-qvutc0').then(retweetLink => {
+			/*
+			 * TODO: on desktop, this gets called twice, unfortunately.
+			 */
 			if (retweetLink.innerText == "Repost") {
 				retweetLink.innerHTML = "Retweet";
 				debug("Renamed 'Retweet' in renameRetweetLink");
@@ -485,7 +492,11 @@
 			if (maybeNewTitle != title) {
 				info('Title changed:', maybeNewTitle);
 				title = maybeNewTitle;
-				rename();
+				if (!title.includes("Twitter")) {
+					info("Big renaming: starting...");
+					rename();
+					info("Big renaming: done ✅");
+				}
 			}
 		});
 		waitForElement('title').then(elem => {
