@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Twitter: bring back old name and logo
 // @namespace    https://github.com/rybak
-// @version      7.1
+// @version      8
 // @description  Changes the tab icon, tab name, header logo, and naming of "tweets" on Twitter
 // @author       Andrei Rybak
 // @license      MIT
@@ -209,23 +209,21 @@
 		waitForElement('a[data-testid="SideNav_NewTweet_Button"] > div > span > div > div > span > span').then(tweetButton => {
 			tweetButton.innerHTML = "Tweet";
 		});
-		waitForElement('div[data-testid="tweetButtonInline"] > div > span > span').then(tweetButton => {
-			tweetButton.innerHTML = "Tweet";
-		});
 		waitForElement(DIALOG_TWEET_BUTTON_SELECTOR).then(tweetButton => {
 			tweetButton.innerHTML = "Tweet";
 			if (tweetButtonObserver != null) {
 				return;
 			}
 			tweetButtonObserver = new MutationObserver(mutations => {
-				// TODO using `waitForElement` here might be excessive
-				waitForElement(DIALOG_TWEET_BUTTON_SELECTOR).then(newTweetButton => {
-					if (newTweetButton.innerText == "Post all") {
-						newTweetButton.innerText = "Tweet all";
-					} else if (newTweetButton.innerText == "Post") {
-						newTweetButton.innerText = "Tweet";
-					}
-				});
+				const newTweetButton = document.querySelector(DIALOG_TWEET_BUTTON_SELECTOR);
+				if (newTweetButton == null) {
+					return;
+				}
+				if (newTweetButton.innerText == "Post all") {
+					newTweetButton.innerText = "Tweet all";
+				} else if (newTweetButton.innerText == "Post") {
+					newTweetButton.innerText = "Tweet";
+				}
 			});
 			/*
 			 * Separate observer is needed to avoid leaking `tweetButtonObserver`
@@ -244,6 +242,10 @@
 			info("Connected tweetButtonObserver");
 			dialogObserver.observe(document.body, { childList: true, subtree: true });
 		});
+		/*
+		 * Intentionally do not rename element 'div[data-testid="tweetButtonInline"] > div > span > span',
+		 * which was always "Reply" and not "Tweet".
+		 */
 	}
 
 	/*
@@ -264,12 +266,22 @@
 		});
 	}
 
+	/*
+	 * Renames the header on a page for a singular tweet.
+	 */
+	function renameTweetHeader() {
+		waitForElement('h2 > .css-901oao.css-16my406.r-poiln3.r-bcqeeo.r-qvutc0').then(tweetHeader => {
+			tweetHeader.innerHTML = "Tweet";
+		});
+	}
+
 	function rename() {
 		replaceTabName();
 		renameProfileTweetsCounter();
 		renameTweetButton();
 		renameRetweetsCounter();
 		renameAddAnotherTweetButton();
+		renameTweetHeader();
 	}
 
 	function setUpRenamer() {
