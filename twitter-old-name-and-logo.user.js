@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Twitter: bring back old name and logo
 // @namespace    https://github.com/rybak
-// @version      16.6
+// @version      16.7
 // @description  Changes the logo, tab name, and naming of "tweets" on Twitter
 // @author       Andrei Rybak
 // @license      MIT
@@ -83,13 +83,15 @@
 	// adapted from https://stackoverflow.com/a/61511955/1083697 by Yong Wang
 	function waitForElement(selector) {
 		return new Promise(resolve => {
-			if (document.querySelector(selector)) {
-				return resolve(document.querySelector(selector));
+			const queryResult = document.querySelector(selector);
+			if (queryResult) {
+				return resolve(queryResult);
 			}
 			const observer = new MutationObserver(mutations => {
-				if (document.querySelector(selector)) {
+				const queryResult = document.querySelector(selector);
+				if (queryResult) {
 					observer.disconnect();
-					resolve(document.querySelector(selector));
+					resolve(queryResult);
 				}
 			});
 
