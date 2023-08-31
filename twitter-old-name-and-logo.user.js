@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Twitter: bring back old name and logo
 // @namespace    https://github.com/rybak
-// @version      13
+// @version      13.1
 // @description  Changes the logo, tab name, and naming of "tweets" on Twitter
 // @author       Andrei Rybak
 // @license      MIT
@@ -47,6 +47,12 @@
 
 (function() {
 	'use strict';
+	/*
+	 * This is needed to replace the very first "X" in <title>, because
+	 * proper renaming and the MutationObserver for <title> are going
+	 * to be too late to fix it.
+	 */
+	document.title = "Twitter";
 
 	const TWITTER_2012_ICON_URL = 'https://abs.twimg.com/favicons/twitter.2.ico';
 
