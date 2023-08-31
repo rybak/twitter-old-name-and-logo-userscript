@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Twitter: bring back old name and logo
 // @namespace    https://github.com/rybak
-// @version      16.4
+// @version      16.5
 // @description  Changes the logo, tab name, and naming of "tweets" on Twitter
 // @author       Andrei Rybak
 // @license      MIT
@@ -62,6 +62,7 @@
 	const FAVICON_SELECTOR = 'link[rel="icon"], link[rel="shortcut icon"]';
 	const POSTS_SELECTOR = createPostsSelector();
 	const DIALOG_TWEET_BUTTON_SELECTOR = 'div[data-testid="tweetButton"] > div > span > span';
+	const RETWEETED_SELECTOR = '[data-testid="socialContext"]';
 
 	function error(...toLog) {
 		console.error(LOG_PREFIX, ...toLog);
@@ -363,7 +364,7 @@
 	}
 
 	function doRenameRetweeted() {
-		const allRetweeted = document.querySelectorAll('[data-testid="socialContext"]');
+		const allRetweeted = document.querySelectorAll(RETWEETED_SELECTOR);
 		let counter = 0;
 		for (const retweeted of allRetweeted) {
 			if (retweeted.childNodes.length < 3) {
@@ -379,6 +380,17 @@
 		if (counter > 0) {
 			debug(`Renamed fresh ${counter} retweeted text nodes.`);
 		}
+	}
+
+	/*
+	 * Whenever timeline gets recreated/replaced on-the-fly,
+	 * we need to wait a bit, until the retweets actually
+	 * appear in the document.
+	 */
+	function renameRetweetedGently() {
+		waitForElement(RETWEETED_SELECTOR).then(ignored => {
+			doRenameRetweeted();
+		});
 	}
 
 	let timelineObserver;
@@ -404,13 +416,12 @@
 				timelineObserver.disconnect();
 				info("Disconnected timeline observer for doRenameRetweeted()");
 			}
-			doRenameRetweeted();
+			renameRetweetedGently();
 			timelineObserver = new MutationObserver((mutationsList) => {
 				doRenameRetweeted();
 			});
 			timelineObserver.observe(document.querySelector(selector), { subtree: true, childList: true });
 			info("Added timeline observer for doRenameRetweeted()");
-			doRenameRetweeted();
 		});
 		doRenameRetweeted();
 	}
