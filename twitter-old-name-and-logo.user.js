@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Twitter: bring back old name and logo
 // @namespace    https://github.com/rybak
-// @version      16.3
+// @version      16.4
 // @description  Changes the logo, tab name, and naming of "tweets" on Twitter
 // @author       Andrei Rybak
 // @license      MIT
@@ -228,24 +228,25 @@
 	 * Renames existing "Tweet" buttons in popup dialogs on desktop.
 	 */
 	function doRenameDialogTweetButton() {
-						const newTweetButton = document.querySelector(DIALOG_TWEET_BUTTON_SELECTOR);
-				if (newTweetButton == null) {
-					return;
-				}
-				if (newTweetButton.innerText == "Post all") {
-					newTweetButton.innerText = "Tweet all";
-				} else if (newTweetButton.innerText == "Post") {
-					newTweetButton.innerText = "Tweet";
-					debug("DIALOG_TWEET_BUTTON_SELECTOR", newTweetButton);
-				}
-
+		const newTweetButton = document.querySelector(DIALOG_TWEET_BUTTON_SELECTOR);
+		if (newTweetButton == null) {
+			return;
+		}
+		if (newTweetButton.innerText == "Post all") {
+			newTweetButton.innerText = "Tweet all";
+			debug("DIALOG_TWEET_BUTTON_SELECTOR", newTweetButton);
+		} else if (newTweetButton.innerText == "Post") {
+			newTweetButton.innerText = "Tweet";
+			debug("DIALOG_TWEET_BUTTON_SELECTOR", newTweetButton);
+		}
 	}
 
 	/*
 	 * Button "Tweet" needs to change dynamically into "Tweet all" when
 	 * more than two tweets are added to the "draft".
 	 *
-	 * This observer detects changes in its text.
+	 * This observer detects changes in its text, because the button
+	 * actually gets recreated inside the popup dialog.
 	 */
 	let tweetButtonObserver = null;
 
@@ -540,6 +541,21 @@
 		});
 	}
 
+	/*
+	 * There are four layers to the userscript:
+	 *
+	 * 1. Big rename in `rename()`, i.e. this function. It gets called
+	 *    whenever we suspect that an on-the-fly change of the whole
+	 *    page happened.  It calls functions from layers 2 and 3.
+	 *    See function `setUpRenamer()` for details.
+	 * 2. `MutaitionObserver`s for stuff that gets updated on-the-fly.
+	 *    These observers are set up by various `renew...Observer()`
+	 *    functions. These observers call functions from layers 3 and 4.
+	 * 3. Various `rename<this and that>()` functions, that wait for their
+	 *    target element.
+	 * 4. Various `doRename<this and that>()` functions, that assume that
+	 *    their target element already exists in the document.
+	 */
 	function rename() {
 		// "Tweet" button and tab's <title> are ubiquitous
 		renameTweetButton();
