@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Twitter: bring back old name and logo
 // @namespace    https://github.com/rybak
-// @version      21.1
+// @version      21.2
 // @description  Changes the logo, tab name, and naming of "tweets" on Twitter
 // @author       Andrei Rybak
 // @license      MIT
@@ -479,12 +479,9 @@
 		 * The code below kinda works, but the user still sees "reposted" from time
 		 * to time.  Any suggestions for improvements are welcome.
 		 *
-		 * The selector for `section` needs to be so specific, because
-		 * switching between "For you" and "Following" creates several
-		 * `section` tags.
+		 * We wait for the <section> that the user sees to appear.
 		 */
-		const selector = 'main section.css-1dbjc4n';
-		waitForElement(selector).then(timeline => {
+		waitForElement('main [data-testid="primaryColumn"] section.css-1dbjc4n').then(timeline => {
 			if (timelineObserver != null) {
 				timelineObserver.disconnect();
 				timelineObserver = null;
@@ -497,10 +494,10 @@
 				renameShowTweets();
 			});
 			/*
-			 * Argh. Don't know of a good way to switch the observer
-			 * between tags in "For you" and in "Following" tabs.
+			 * And we observe all <section> tags:
 			 */
-			const allSections = document.querySelectorAll(selector);
+			const allSections = document.querySelectorAll('main section.css-1dbjc4n');
+			info("Renewing timeline observer for", allSections.length, "tags");
 			for (const section of allSections) {
 				timelineObserver.observe(section, { subtree: true, childList: true, characterData: true });
 				info("Added timeline observer", section);
@@ -643,6 +640,12 @@
 				pill.innerHTML = "See new tweets";
 				debug('Renamed "See new tweets" pill');
 				/*
+				 * FIXME: A dirty hack to sync the pill with the clickable link
+				 *        can't figure out how to make `renewTimelineObserver()`
+				 *        detect the clickable link properly.
+				 */
+				renameShowTweets();
+				/*
 				 * If a user keeps the timeline open long enough, pill "See new tweets"
 				 * turns into "X, Y, Z posted".  This observer will make sure to rename
 				 * it to "X, Y, Z tweeted".
@@ -725,7 +728,6 @@
 		// timeline + tweets on a timeline
 		renewLayersObserver();
 		renameSeeTweetsPill();
-		renewTimelineObserver();
 
 		renewNotificationsObserver();
 	}
@@ -740,6 +742,7 @@
 				if (!title.includes("Twitter") || title.endsWith("/ X")) {
 					info("Big renaming: starting...");
 					rename();
+					renewTimelineObserver();
 					info("Big renaming: done ✅");
 				}
 			}
