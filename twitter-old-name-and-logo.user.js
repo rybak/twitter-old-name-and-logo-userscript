@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Twitter: bring back old name and logo
 // @namespace    https://github.com/rybak
-// @version      17
+// @version      18
 // @description  Changes the logo, tab name, and naming of "tweets" on Twitter
 // @author       Andrei Rybak
 // @license      MIT
@@ -34,10 +34,12 @@
  */
 
 /*
- * Things which surprisingly don't need replacing/renaming as of 2023-08-19:
+ * Things which surprisingly don't need replacing/renaming as of 2023-08-21:
  *
  *   1. "Scheduled Tweets" are still called "Tweets"
  *   2. Clickable link "Show <number> Tweets", when you have the timeline open for a while.
+ *   3. Header "Delete Tweet?" in the popup when deleting a tweet.
+ *   4. "Your Tweet was deleted" popup ("toast") message after deleting at tweet.
  *
  * Things deliberately left with the new name:
  *
@@ -490,6 +492,17 @@
 		});
 	}
 
+	function renameYourTweetWasSent() {
+		const maybeToast = document.querySelector('#layers [data-testid="toast"] > div > span');
+		if (maybeToast) {
+			const t = maybeToast.innerText;
+			if (t.includes(' post ')) {
+				maybeToast.innerHTML = t.replace(' post ', ' tweet ');
+				debug("renameYourTweetWasSent", t);
+			}
+		}
+	}
+
 	let layersObserver;
 
 	/*
@@ -517,6 +530,7 @@
 				renameAddAnotherTweetPlaceholder();
 				doRenameDialogTweetButton();
 				renameRetweetedByPopupHeader();
+				renameYourTweetWasSent();
 			});
 			layersObserver.observe(retweetDropdownContainer, { subtree: true, childList: true });
 			info("Added layersObserver");
