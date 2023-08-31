@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Twitter: bring back old name and logo
 // @namespace    https://github.com/rybak
-// @version      15.2
+// @version      15.3
 // @description  Changes the logo, tab name, and naming of "tweets" on Twitter
 // @author       Andrei Rybak
 // @license      MIT
@@ -109,7 +109,8 @@
 		// "Default" = light theme
 		// const lightThemeSelector  = '.css-901oao.css-1hf3ou5.r-14j79pv.r-37j5jr.r-n6v787.r-16dba41.r-1cwl3u0.r-bcqeeo.r-qvutc0';
 		//                                                     ^^^^^^^^^^
-		const commonDesktopSelector = '.css-901oao.css-1hf3ou5.r-37j5jr.r-n6v787.r-16dba41.r-1cwl3u0.r-bcqeeo.r-qvutc0';
+		// <h2> tag = user's name in the header, right above the tweet counter
+		const commonDesktopSelector = 'h2 + .css-901oao.css-1hf3ou5.r-37j5jr.r-n6v787.r-16dba41.r-1cwl3u0.r-bcqeeo.r-qvutc0';
 
 		// const fakeMobileSelector = '.css-901oao.css-1hf3ou5.r-1bwzh9t.r-37j5jr.r-n6v787.r-16dba41.r-1cwl3u0.r-bcqeeo.r-qvutc0'; // "Lights out" in mobile emulation in desktop browser
 		// const darkMobileSelector = '.css-901oao.css-1hf3ou5.r-1bwzh9t.r-37j5jr.r-1b43r93.r-16dba41.r-14yzgew.r-bcqeeo.r-qvutc0'; // "Lights out" from Firefox Android
@@ -118,6 +119,7 @@
 		//                                                    ^^^^^^^^^^         ^^^^^^^^^
 
 		const commonMobileSelector = '.css-901oao.css-1hf3ou5.r-37j5jr.r-1b43r93.r-16dba41.r-14yzgew.r-bcqeeo.r-qvutc0';
+
 		return `${commonDesktopSelector}, ${commonMobileSelector}`;
 	}
 
