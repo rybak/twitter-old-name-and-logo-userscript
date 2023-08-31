@@ -243,6 +243,7 @@
 			dialogObserver.observe(document.body, { childList: true, subtree: true });
 		});
 		waitForElement('div[data-testid="tweetButtonInline"] > div > span > span').then(tweetButton => {
+			// sometimes this button has the correct text "Reply"
 			if (tweetButton.innerText == "Post") {
 				tweetButton.innerHTML = "Tweet";
 			}
@@ -272,7 +273,6 @@
 	 */
 	function renameTweetHeader() {
 		waitForElement('h2 > .css-901oao.css-16my406.r-poiln3.r-bcqeeo.r-qvutc0').then(tweetHeader => {
-			// sometimes this button has the correct text "Reply"
 			if (tweetHeader.innerText == "Post") {
 				tweetHeader.innerHTML = "Tweet";
 			}
