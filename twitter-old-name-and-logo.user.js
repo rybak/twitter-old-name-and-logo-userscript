@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Twitter: bring back old name and logo
 // @namespace    https://github.com/rybak
-// @version      15
+// @version      15.1
 // @description  Changes the logo, tab name, and naming of "tweets" on Twitter
 // @author       Andrei Rybak
 // @license      MIT
@@ -381,7 +381,9 @@
 	 *      "Share" icon (mobile) in the bottom right of a tweet.
 	 */
 	function renameDropdownItems() {
-		waitForElement('[data-testid="Dropdown"]').then(dropdown => {
+		// Desktop: [data-testid="Dropdown"]
+		// Mobile : [data-testid="sheetDialog"]
+		waitForElement('#layers [role="menu"]').then(dropdown => {
 			dropdown.querySelectorAll('span.css-901oao.css-16my406.r-poiln3.r-bcqeeo.r-qvutc0').forEach(span => {
 				if (span.innerText.includes("post")) {
 					span.innerHTML = span.innerText.replace("post", "tweet");
