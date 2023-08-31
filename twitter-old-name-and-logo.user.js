@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Twitter: bring back old name and logo
 // @namespace    https://github.com/rybak
-// @version      16.1
+// @version      16.2
 // @description  Changes the logo, tab name, and naming of "tweets" on Twitter
 // @author       Andrei Rybak
 // @license      MIT
@@ -335,18 +335,26 @@
 		});
 	}
 
-	function renameTweetYourReplyPlaceholder() {
+	function renameTweetPlaceholders(targetText, replacementText, debugMessage) {
 		// desktop
-		renameDraftEditorPlaceholder("Post your reply!", "Tweet your reply!", "renameTweetYourReplyPlaceholder");
+		renameDraftEditorPlaceholder(targetText, replacementText);
 		// mobile
-		renameTextAreaAttributePlaceholder("Post your reply!", "Tweet your reply!");
+		renameTextAreaAttributePlaceholder(targetText, replacementText);
+		waitForElement(`textarea[placeholder="${targetText}"]`).then(textarea => {
+			textarea.setAttribute('placeholder', replacementText);
+		});
 		/*
 		 * TODO: is there some way to detect desktop vs mobile?
 		 */
 	}
 
-	function renameRetweeted() {
+	function renameTweetYourReplyPlaceholder() {
+		renameTweetPlaceholders("Post your reply!", "Tweet your reply!", "renameTweetYourReplyPlaceholder");
+	}
+
+	function doRenameRetweeted() {
 		const allRetweeted = document.querySelectorAll('[data-testid="socialContext"]');
+		let counter = 0;
 		for (const retweeted of allRetweeted) {
 			if (retweeted.childNodes.length < 3) {
 				continue;
@@ -355,22 +363,25 @@
 			if (retweetedText.textContent == " reposted") {
 				retweetedText.remove();
 				retweeted.append(" retweeted");
+				counter++;
 			}
 		}
-		debug("Renamed fresh retweeted");
+		if (counter > 0) {
+			debug(`Renamed fresh ${counter} retweeted text nodes.`);
+		}
 	}
 
 	let timelineObserver;
 
 	/*
-	 * Reconnects the observer for `renameRetweeted()` to the timeline node.
+	 * Reconnects the observer for `doRenameRetweeted()` to the timeline node.
 	 * This is needed when the page changes completely and a new timeline
 	 * node appears in the DOM.
 	 */
 	function renewRetweetedTimelineObserver() {
 		/*
 		 * Renaming "Jane Doe retweeted" when you know where these nodes are is easy.
-		 * That's the function `renameRetweeted()` above.  But keeping track of them
+		 * That's the function `doRenameRetweeted()` above.  But keeping track of them
 		 * appearing in the timeline is difficult, if you also don't want to waste
 		 * CPU unnecessarily.
 		 *
@@ -381,17 +392,17 @@
 		waitForElement(selector).then(timeline => {
 			if (timelineObserver != null) {
 				timelineObserver.disconnect();
-				info("Disconnected timeline observer for renameRetweeted()");
+				info("Disconnected timeline observer for doRenameRetweeted()");
 			}
-			renameRetweeted();
+			doRenameRetweeted();
 			timelineObserver = new MutationObserver((mutationsList) => {
-				renameRetweeted();
+				doRenameRetweeted();
 			});
 			timelineObserver.observe(document.querySelector(selector), { subtree: true, childList: true });
-			info("Added timeline observer for renameRetweeted()");
-			renameRetweeted();
+			info("Added timeline observer for doRenameRetweeted()");
+			doRenameRetweeted();
 		});
-		renameRetweeted();
+		doRenameRetweeted();
 	}
 
 	function renameRetweetLink() {
@@ -438,10 +449,7 @@
 	}
 
 	function renameAddAnotherTweetPlaceholder() {
-		const targetText = "Add another post!";
-		const replacementText = "Add another tweet!";
-		renameDraftEditorPlaceholder(targetText, replacementText, "renameAddAnotherTweetPlaceholder");
-		renameTextAreaAttributePlaceholder(targetText, replacementText);
+		renameTweetPlaceholders("Add another post!", "Add another tweet!", "renameAddAnotherTweetPlaceholder");
 	}
 
 	let layersObserver;
@@ -526,12 +534,15 @@
 		// "Tweet" button and tab's <title> are ubiquitous
 		renameTweetButton();
 		renameTwitterInTabName();
+
 		// targets for renaming on a singular tweet page
 		renameTweetHeader();
 		renameRetweetsCounter();
 		renameTweetYourReplyPlaceholder();
+
 		// target for renaming on a user's profile
 		renameProfileTweetsCounter();
+
 		// adding to your own thread
 		renameAddAnotherTweetButton();
 		renewRetweetedTimelineObserver();
