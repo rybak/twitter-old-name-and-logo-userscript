@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Twitter: bring back old name and logo
 // @namespace    https://github.com/rybak
-// @version      15.1
+// @version      15.2
 // @description  Changes the logo, tab name, and naming of "tweets" on Twitter
 // @author       Andrei Rybak
 // @license      MIT
@@ -320,7 +320,7 @@
 				retweeted.append(" retweeted");
 			}
 		}
-		info("Renamed fresh retweeted");
+		debug("Renamed fresh retweeted");
 	}
 
 	let timelineObserver;
@@ -370,6 +370,7 @@
 		waitForElement('[data-testid="HoverLabel"] span').then(retweetTooltip => {
 			if (retweetTooltip.innerText == "Repost") {
 				retweetTooltip.innerText = "Retweet";
+				debug("Renamed 'Retweet' in renameRetweetTooltip");
 			}
 		});
 	}
@@ -403,6 +404,7 @@
 			if (layersObserver != null) {
 				layersObserver.disconnect();
 				layersObserver = null;
+				info("Disconnected layersObserver");
 			}
 			layersObserver = new MutationObserver(mutationsList => {
 				renameRetweetLink();
@@ -414,9 +416,24 @@
 		});
 	}
 
+	function renameTweetInNotifications() {
+		/*
+		 * This mess of a selector tries to minimize the amount of `spanNodes` that match.
+		 */
+		const spanNodes = document.querySelectorAll('article div.css-901oao.r-1nao33i.r-37j5jr.r-a023e6.r-16dba41.r-rjixqe.r-bcqeeo.r-1udh08x.r-qvutc0 span span.css-901oao.css-16my406.r-poiln3.r-bcqeeo.r-qvutc0');
+		spanNodes.forEach(spanNode => {
+			if (spanNode.innerText.includes("post")) {
+				let s = spanNode.innerText;
+				s = s.replaceAll(" repost", " retweet");
+				s = s.replaceAll(" post", " tweet");
+				spanNode.innerText = s;
+			}
+		});
+	}
+
 	let notificationsObserver;
 
-	function renameTweetNotifications() {
+	function renewNotificationsObserver() {
 		if (document.location.pathname != '/notifications') {
 			if (notificationsObserver != null) {
 				notificationsObserver.disconnect();
@@ -426,19 +443,7 @@
 		}
 		waitForElement('[aria-label="Timeline: Notifications"]').then(notificationsContainer => {
 			notificationsObserver = new MutationObserver(mutationsList => {
-				/*
-				 * This mess of a selector tries to minimize the amount of `spanNodes` that match.
-				 */
-				const spanNodes = document.querySelectorAll('article div.css-901oao.r-1nao33i.r-37j5jr.r-a023e6.r-16dba41.r-rjixqe.r-bcqeeo.r-1udh08x.r-qvutc0 span span.css-901oao.css-16my406.r-poiln3.r-bcqeeo.r-qvutc0');
-				spanNodes.forEach(spanNode => {
-					debug(spanNode.innerText);
-					if (spanNode.innerText.includes("post")) {
-						let s = spanNode.innerText;
-						s = s.replaceAll(" repost", " retweet");
-						s = s.replaceAll(" post", " tweet");
-						spanNode.innerText = s;
-					}
-				});
+				renameTweetInNotifications();
 			});
 			notificationsObserver.observe(notificationsContainer, { subtree: true, childList: true });
 			info("Added notificationsObserver");
@@ -460,7 +465,7 @@
 		renewRetweetedTimelineObserver();
 
 		renewLayersObserver();
-		renameTweetNotifications();
+		renewNotificationsObserver();
 	}
 
 	function setUpRenamer() {
