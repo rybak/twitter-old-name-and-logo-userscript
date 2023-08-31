@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Twitter: bring back old name and logo
 // @namespace    https://github.com/rybak
-// @version      16.7
+// @version      16.8
 // @description  Changes the logo, tab name, and naming of "tweets" on Twitter
 // @author       Andrei Rybak
 // @license      MIT
@@ -512,12 +512,16 @@
 	function renameSeeTweetsPill() {
 		/*
 		 * Several types of "pills":
-		 *   - "X, Y, Z posted"
-		 *   - "See <number> new posts"
+		 *   - "X, Y, Z tweets"
+		 *   - "See new tweets"
 		 */
 		waitForElement('[data-testid="pillLabel"] span span span.css-901oao.css-16my406.r-poiln3.r-bcqeeo.r-qvutc0').then(pill => {
 			if (pill.innerText == "posted") {
 				pill.innerHTML = "tweeted";
+				debug('Renamed "tweeted" pill');
+			} else if (pill.innerText == "See new posts") {
+				pill.innerHTML = "See new tweets";
+				debug('Renamed "See new tweets" pill');
 			}
 		});
 	}
