@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Twitter: bring back old name and logo
 // @namespace    https://github.com/rybak
-// @version      7
+// @version      7.1
 // @description  Changes the tab icon, tab name, header logo, and naming of "tweets" on Twitter
 // @author       Andrei Rybak
 // @license      MIT
@@ -91,6 +91,11 @@
 		});
 	}
 
+	/*
+	 * Tweets/Posts counters in user profiles are weird.  Their nesting/wrapping
+	 * depends on the theme and on mobile vs desktop.
+	 * By "theme" I mean "More > Settings and Support > Display > Background".
+	 */
 	function createPostsSelector() {
 		// "Lights out" = dark theme
 		// const darkThemeSelector   = '.css-901oao.css-1hf3ou5.r-1bwzh9t.r-37j5jr.r-n6v787.r-16dba41.r-1cwl3u0.r-bcqeeo.r-qvutc0';
@@ -104,7 +109,7 @@
 		// const darkMobileSelector = '.css-901oao.css-1hf3ou5.r-1bwzh9t.r-37j5jr.r-1b43r93.r-16dba41.r-14yzgew.r-bcqeeo.r-qvutc0'; // "Lights out" from Firefox Android
 		// const  dimMobileSelector = '.css-901oao.css-1hf3ou5.r-115tad6.r-37j5jr.r-1b43r93.r-16dba41.r-14yzgew.r-bcqeeo.r-qvutc0'; // "Dim" from Firefox Android
 		// const liteMobileSelector = '.css-901oao.css-1hf3ou5.r-14j79pv.r-37j5jr.r-1b43r93.r-16dba41.r-14yzgew.r-bcqeeo.r-qvutc0'; // "Default" from Firefox Android
-		//                                                    ^^^^^^^^^^
+		//                                                    ^^^^^^^^^^         ^^^^^^^^^
 
 		const commonMobileSelector = '.css-901oao.css-1hf3ou5.r-37j5jr.r-1b43r93.r-16dba41.r-14yzgew.r-bcqeeo.r-qvutc0';
 		return `${commonDesktopSelector}, ${commonMobileSelector}`;
@@ -155,7 +160,7 @@
 	/*
 	 * Replaces text "123 posts" with "123 tweets" on user profile pages.
 	 */
-	function renameTweets() {
+	function renameProfileTweetsCounter() {
 		/*
 		// Debug code for figuring out CSS selectors for mobile version
 		const allDivs = document.querySelectorAll('div');
@@ -190,11 +195,16 @@
 	}
 
 	/*
-	 * Button "Tweet" needs to change dynamically into "Tweet all".
-	 * Do it via a separate observer for its text.
+	 * Button "Tweet" needs to change dynamically into "Tweet all" when
+	 * more than two tweets are added to the "draft".
+	 *
+	 * This observer detects changes in its text.
 	 */
 	let tweetButtonObserver = null;
 
+	/*
+	 * Renames various oval blue buttons used to send a tweet, i.e. "to tweet".
+	 */
 	function renameTweetButton() {
 		waitForElement('a[data-testid="SideNav_NewTweet_Button"] > div > span > div > div > span > span').then(tweetButton => {
 			tweetButton.innerHTML = "Tweet";
@@ -208,6 +218,7 @@
 				return;
 			}
 			tweetButtonObserver = new MutationObserver(mutations => {
+				// TODO using `waitForElement` here might be excessive
 				waitForElement(DIALOG_TWEET_BUTTON_SELECTOR).then(newTweetButton => {
 					if (newTweetButton.innerText == "Post all") {
 						newTweetButton.innerText = "Tweet all";
@@ -216,6 +227,11 @@
 					}
 				});
 			});
+			/*
+			 * Separate observer is needed to avoid leaking `tweetButtonObserver`
+			 * and to reconnect `tweetButtonObserver` onto new buttons, when
+			 * they appear.
+			 */
 			const dialogObserver = new MutationObserver(mutations => {
 				if (document.querySelector('[role="dialog"]') == null) {
 					tweetButtonObserver.disconnect();
@@ -230,12 +246,18 @@
 		});
 	}
 
+	/*
+	 * Renames counter of retweets on an individual tweet's page.
+	 */
 	function renameRetweetsCounter() {
 		waitForElement('a[href$="/retweets"] > span > span').then(retweetsCounterElement => {
 			retweetsCounterElement.innerHTML = "Retweets";
 		});
 	}
 
+	/*
+	 * Renames "Add another tweet" button (for continuing your own existing thread).
+	 */
 	function renameAddAnotherTweetButton() {
 		waitForElement('main section .css-901oao.css-16my406.css-1hf3ou5.r-poiln3.r-1b43r93.r-1cwl3u0.r-bcqeeo.r-qvutc0 .css-901oao.css-16my406.r-poiln3.r-bcqeeo.r-qvutc0').then(addAnotherTweetButton => {
 			addAnotherTweetButton.innerHTML = "Add another tweet";
@@ -244,7 +266,7 @@
 
 	function rename() {
 		replaceTabName();
-		renameTweets();
+		renameProfileTweetsCounter();
 		renameTweetButton();
 		renameRetweetsCounter();
 		renameAddAnotherTweetButton();
