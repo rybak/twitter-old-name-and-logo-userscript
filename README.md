@@ -1,11 +1,11 @@
+[![Badge showing number of installs from Greasy Fork][GreasyForkInstallsBadge]][GreasyFork]
+
 # Twitter: bring back old name and logo
 
 This userscript replaces logos and renames "tweets" in various parts of Twitter
 web UI.
 
 See screenshots and install the userscript on [Greasy Fork][GreasyFork].
-
-[![Badge showing number of installs from Greasy Fork][GreasyForkInstallsBadge]][GreasyFork]
 
 The source code is distributed under the terms of the MIT license.
 See [LICENSE.txt](LICENSE.txt) for details.
