@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Twitter: bring back old name and logo
 // @namespace    https://github.com/rybak
-// @version      21.3
+// @version      21.4
 // @description  Changes the logo, tab name, and naming of "tweets" on Twitter
 // @author       Andrei Rybak
 // @license      MIT
@@ -388,11 +388,20 @@
 		const allRetweeted = document.querySelectorAll(RETWEETED_SELECTOR);
 		let counter = 0;
 		for (const retweeted of allRetweeted) {
+			if (retweeted.childNodes.length == 1) {
+				const inner = retweeted.childNodes[0];
+				if (inner.childNodes[0].textContent === "You reposted") {
+					inner.childNodes[0].remove();
+					inner.append("You retweeted");
+					counter++;
+				}
+				continue;
+			}
 			if (retweeted.childNodes.length < 3) {
 				continue;
 			}
 			const retweetedText = retweeted.childNodes[2];
-			if (retweetedText.textContent == " reposted") {
+			if (retweetedText.textContent === " reposted") {
 				retweetedText.remove();
 				retweeted.append(" retweeted");
 				counter++;
