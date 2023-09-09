@@ -8,6 +8,7 @@
 // @match        https://twitter.com/*
 // @icon         https://www.google.com/s2/favicons?sz=64&domain=twitter.com
 // @grant        GM_addStyle
+// @require      https://cdn.jsdelivr.net/gh/rybak/userscript-libs@e86c722f2c9cc2a96298c8511028f15c45180185/waitForElement.js
 // @run-at       document-body
 // ==/UserScript==
 
@@ -79,28 +80,6 @@
 
 	function debug(...toLog) {
 		console.debug(LOG_PREFIX, ...toLog);
-	}
-
-	// adapted from https://stackoverflow.com/a/61511955/1083697 by Yong Wang
-	function waitForElement(selector) {
-		return new Promise(resolve => {
-			const queryResult = document.querySelector(selector);
-			if (queryResult) {
-				return resolve(queryResult);
-			}
-			const observer = new MutationObserver(mutations => {
-				const queryResult = document.querySelector(selector);
-				if (queryResult) {
-					observer.disconnect();
-					resolve(queryResult);
-				}
-			});
-
-			observer.observe(document.body, {
-				childList: true,
-				subtree: true
-			});
-		});
 	}
 
 	/*
