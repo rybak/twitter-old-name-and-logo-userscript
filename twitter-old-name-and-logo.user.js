@@ -1,15 +1,19 @@
 // ==UserScript==
-// @name         Twitter: bring back old name and logo
-// @namespace    https://github.com/rybak
-// @version      21.4
-// @description  Changes the logo, tab name, and naming of "tweets" on Twitter
-// @author       Andrei Rybak
-// @license      MIT
-// @match        https://twitter.com/*
-// @icon         https://www.google.com/s2/favicons?sz=64&domain=twitter.com
-// @grant        GM_addStyle
-// @require      https://cdn.jsdelivr.net/gh/rybak/userscript-libs@e86c722f2c9cc2a96298c8511028f15c45180185/waitForElement.js
-// @run-at       document-body
+// @name           Twitter: bring back old name and logo
+// @name:de        Twitter: alten Namen und Logo zurückbringen
+// @name:nl        Twitter: oude naam en logo terugbrengen
+// @namespace      https://github.com/rybak
+// @version        21.5
+// @description    Changes the logo, tab name, and naming of "tweets" on Twitter
+// @description:de Ändert das Logo, den Tab-Namen und die Benennung von „Tweets“ auf Twitter
+// @description:nl Wijzigt het logo, de tabbladnaam en de naamgeving van "tweets" op Twitter
+// @author         Andrei Rybak
+// @license        MIT
+// @match          https://twitter.com/*
+// @icon           https://www.google.com/s2/favicons?sz=64&domain=twitter.com
+// @grant          GM_addStyle
+// @require        https://cdn.jsdelivr.net/gh/rybak/userscript-libs@e86c722f2c9cc2a96298c8511028f15c45180185/waitForElement.js
+// @run-at         document-body
 // ==/UserScript==
 
 /*
