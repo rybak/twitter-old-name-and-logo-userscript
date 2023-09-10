@@ -2,11 +2,13 @@
 // @name           Twitter: bring back old name and logo
 // @name:de        Twitter: alten Namen und Logo zurückbringen
 // @name:nl        Twitter: oude naam en logo terugbrengen
+// @name:es        Twitter: recupera el nombre y el logotipo antiguos
 // @namespace      https://github.com/rybak
 // @version        21.5
 // @description    Changes the logo, tab name, and naming of "tweets" on Twitter
 // @description:de Ändert das Logo, den Tab-Namen und die Benennung von „Tweets“ auf Twitter
 // @description:nl Wijzigt het logo, de tabbladnaam en de naamgeving van "tweets" op Twitter
+// @description:es Cambia el logo, nombre de la pestaña y denominación de los "tweets" en Twitter
 // @author         Andrei Rybak
 // @license        MIT
 // @match          https://twitter.com/*
