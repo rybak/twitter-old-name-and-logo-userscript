@@ -4,7 +4,7 @@
 // @name:nl        Twitter: oude naam en logo terugbrengen
 // @name:es        Twitter: recupera el nombre y el logotipo antiguos
 // @namespace      https://github.com/rybak
-// @version        22.1
+// @version        23
 // @description    Changes the logo, tab name, and naming of "tweets" on Twitter
 // @description:de Ändert das Logo, den Tab-Namen und die Benennung von „Tweets“ auf Twitter
 // @description:nl Wijzigt het logo, de tabbladnaam en de naamgeving van "tweets" op Twitter
@@ -350,6 +350,8 @@
 				 * https://www.macrumors.com/2020/08/31/twitter-quote-tweets-feature/
 				 */
 				tweetHeader.innerHTML = "Quote Tweets";
+			} else if (tweetHeader.innerText == "Post engagements") {
+				tweetHeader.innerHTML = "Tweet engagements";
 			}
 		});
 	}
