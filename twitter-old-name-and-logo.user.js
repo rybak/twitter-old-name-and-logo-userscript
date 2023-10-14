@@ -4,7 +4,7 @@
 // @name:nl        Twitter: oude naam en logo terugbrengen
 // @name:es        Twitter: recupera el nombre y el logotipo antiguos
 // @namespace      https://github.com/rybak
-// @version        23.1
+// @version        24
 // @description    Changes the logo, tab name, and naming of "tweets" on Twitter
 // @description:de Ändert das Logo, den Tab-Namen und die Benennung von „Tweets“ auf Twitter
 // @description:nl Wijzigt het logo, de tabbladnaam en de naamgeving van "tweets" op Twitter
@@ -664,10 +664,12 @@
 		 */
 		const spanNodes = document.querySelectorAll('article div.css-901oao.r-1nao33i.r-37j5jr.r-a023e6.r-16dba41.r-rjixqe.r-bcqeeo.r-1udh08x.r-qvutc0 span span.css-901oao.css-16my406.r-poiln3.r-bcqeeo.r-qvutc0');
 		spanNodes.forEach(spanNode => {
-			if (spanNode.innerText.includes("post")) {
+			if (spanNode.innerText.includes("post") || spanNode.innerText.includes("Post")) {
 				let s = spanNode.innerText;
 				s = s.replaceAll(" repost", " retweet");
 				s = s.replaceAll(" post", " tweet");
+				s = s.replaceAll(" Post", " Tweet");
+				s = s.replaceAll(" Repost", " Retweet");
 				spanNode.innerText = s;
 			}
 		});
@@ -689,6 +691,33 @@
 			});
 			notificationsObserver.observe(notificationsContainer, { subtree: true, childList: true });
 			info("Added notificationsObserver");
+		});
+	}
+
+	/*
+	 * "This Tweet is from an account you muted."
+	 * "This Tweet is from an account you blocked."
+	 */
+	function doRenameMutedAndBlockedTweets() {
+		const spanNodes = document.querySelectorAll('section article span > span > span.css-901oao.css-16my406.r-poiln3.r-bcqeeo.r-qvutc0');
+		spanNodes.forEach(spanNode => {
+			if (spanNode.innerText.includes("post") || spanNode.innerText.includes("Post")) {
+				let s = spanNode.innerText;
+				s = s.replaceAll(" repost", " retweet");
+				s = s.replaceAll(" post", " tweet");
+				s = s.replaceAll(" Post", " Tweet");
+				s = s.replaceAll(" Repost", " Retweet");
+				spanNode.innerText = s;
+			}
+		});
+	}
+
+	function renameMutedAndBlockedTweets() {
+		/*
+		 * Weird selector because don't know how to wait for replies.
+		 */
+		waitForElement('main section > div > div > div[data-testid="cellInnerDiv"]:nth-child(3)').then(() => {
+			doRenameMutedAndBlockedTweets();
 		});
 	}
 
@@ -728,6 +757,7 @@
 		// timeline + tweets on a timeline
 		renewLayersObserver();
 		renameSeeTweetsPill();
+		renameMutedAndBlockedTweets();
 
 		renewNotificationsObserver();
 	}
