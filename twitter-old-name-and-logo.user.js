@@ -697,8 +697,10 @@
 	/*
 	 * "This Tweet is from an account you muted."
 	 * "This Tweet is from an account you blocked."
+	 * "You’re unable to view this Tweet because this account owner limits who can view their Tweets."
+	 * "This Tweet was deleted by the Tweet author."
 	 */
-	function doRenameMutedAndBlockedTweets() {
+	function doRenameHiddenTweets() {
 		const spanNodes = document.querySelectorAll('section article span > span > span.css-901oao.css-16my406.r-poiln3.r-bcqeeo.r-qvutc0');
 		spanNodes.forEach(spanNode => {
 			if (spanNode.innerText.includes("post") || spanNode.innerText.includes("Post")) {
@@ -712,12 +714,12 @@
 		});
 	}
 
-	function renameMutedAndBlockedTweets() {
+	function renameHiddenTweets() {
 		/*
 		 * Weird selector because don't know how to wait for replies.
 		 */
 		waitForElement('main section > div > div > div[data-testid="cellInnerDiv"]:nth-child(3)').then(() => {
-			doRenameMutedAndBlockedTweets();
+			doRenameHiddenTweets();
 		});
 	}
 
@@ -757,7 +759,7 @@
 		// timeline + tweets on a timeline
 		renewLayersObserver();
 		renameSeeTweetsPill();
-		renameMutedAndBlockedTweets();
+		renameHiddenTweets();
 
 		renewNotificationsObserver();
 	}
