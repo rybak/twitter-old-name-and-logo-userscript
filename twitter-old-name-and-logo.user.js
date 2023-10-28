@@ -730,7 +730,7 @@
 	 *    whenever we suspect that an on-the-fly change of the whole
 	 *    page happened.  It calls functions from layers 2 and 3.
 	 *    See function `setUpRenamer()` for details.
-	 * 2. `MutaitionObserver`s for stuff that gets updated on-the-fly.
+	 * 2. `MutationObserver`s for stuff that gets updated on-the-fly.
 	 *    These observers are set up by various `renew...Observer()`
 	 *    functions. These observers call functions from layers 3 and 4.
 	 * 3. Various `rename<this and that>()` functions, that wait for their
