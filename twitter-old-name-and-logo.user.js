@@ -4,7 +4,7 @@
 // @name:nl        Twitter: oude naam en logo terugbrengen
 // @name:es        Twitter: recupera el nombre y el logotipo antiguos
 // @namespace      https://github.com/rybak
-// @version        24
+// @version        25
 // @description    Changes the logo, tab name, and naming of "tweets" on Twitter
 // @description:de Ändert das Logo, den Tab-Namen und die Benennung von „Tweets“ auf Twitter
 // @description:nl Wijzigt het logo, de tabbladnaam en de naamgeving van "tweets" op Twitter
@@ -699,6 +699,7 @@
 	 * "This Tweet is from an account you blocked."
 	 * "You’re unable to view this Tweet because this account owner limits who can view their Tweets."
 	 * "This Tweet was deleted by the Tweet author."
+	 * "This Tweet is from an account that no longer exists."
 	 */
 	function doRenameHiddenTweets() {
 		const spanNodes = document.querySelectorAll('section article span > span > span.css-901oao.css-16my406.r-poiln3.r-bcqeeo.r-qvutc0');
@@ -715,10 +716,13 @@
 	}
 
 	function renameHiddenTweets() {
-		/*
-		 * Weird selector because don't know how to wait for replies.
-		 */
-		waitForElement('main section > div > div > div[data-testid="cellInnerDiv"]:nth-child(3)').then(() => {
+		// Weird selectors because don't know how to wait for replies.
+		// First selector - for hidden quoted tweet at the top of the thread.
+		waitForElement('main section > div > div > div[data-testid="cellInnerDiv"]:nth-child(2)').then(() => {
+			doRenameHiddenTweets();
+		});
+		// Second selector - for hidden tweets in replies.
+		waitForElement('main section > div > div > div[data-testid="cellInnerDiv"] > .r-qklmqi.r-1adg3ll').then(() => {
 			doRenameHiddenTweets();
 		});
 	}
