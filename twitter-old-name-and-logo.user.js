@@ -4,7 +4,7 @@
 // @name:nl        Twitter: oude naam en logo terugbrengen
 // @name:es        Twitter: recupera el nombre y el logotipo antiguos
 // @namespace      https://github.com/rybak
-// @version        25
+// @version        26
 // @description    Changes the logo, tab name, and naming of "tweets" on Twitter
 // @description:de Ändert das Logo, den Tab-Namen und die Benennung von „Tweets“ auf Twitter
 // @description:nl Wijzigt het logo, de tabbladnaam en de naamgeving van "tweets" op Twitter
@@ -727,6 +727,18 @@
 		});
 	}
 
+	function renameTranslateTweet() {
+		const translateButtonSelector = 'section > div > div > div[data-testid="cellInnerDiv"] div[role="button"] span.css-901oao.css-16my406.r-poiln3.r-bcqeeo.r-qvutc0';
+		waitForElement(translateButtonSelector).then(button => {
+			const spanNodes = document.querySelectorAll(translateButtonSelector);
+			spanNodes.forEach(spanNode => {
+				if (spanNode.innerText.includes("post")) {
+					spanNode.innerText = spanNode.innerText.replaceAll(" post", " tweet");
+				}
+			});
+		});
+	}
+
 	/*
 	 * There are four layers to the userscript:
 	 *
@@ -752,6 +764,7 @@
 		renameRetweetsCounter();
 		renameQuoteTweetsCounter();
 		renameTweetYourReplyPlaceholder();
+		renameTranslateTweet();
 
 		// targets for renaming on a user's profile
 		renameProfileTweetsCounter();
