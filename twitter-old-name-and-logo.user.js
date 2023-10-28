@@ -4,7 +4,7 @@
 // @name:nl        Twitter: oude naam en logo terugbrengen
 // @name:es        Twitter: recupera el nombre y el logotipo antiguos
 // @namespace      https://github.com/rybak
-// @version        26
+// @version        27
 // @description    Changes the logo, tab name, and naming of "tweets" on Twitter
 // @description:de Ändert das Logo, den Tab-Namen und die Benennung von „Tweets“ auf Twitter
 // @description:nl Wijzigt het logo, de tabbladnaam en de naamgeving van "tweets" op Twitter
@@ -739,6 +739,16 @@
 		});
 	}
 
+	function renameSourcedFromAcrossTwitter() {
+		const selector = 'section > div > div > div[data-testid="cellInnerDiv"] > div > div > div > div > span';
+		waitForElement(selector).then(subheading => {
+			info("renameSourcedFromAcrossTwitter", subheading, subheading.innerText);
+			if (subheading.innerText == "Sourced from across X") {
+				subheading.replaceChildren(document.createTextNode("Sourced from across Twitter"));
+			}
+		});
+	}
+
 	/*
 	 * There are four layers to the userscript:
 	 *
@@ -777,6 +787,7 @@
 		renewLayersObserver();
 		renameSeeTweetsPill();
 		renameHiddenTweets();
+		renameSourcedFromAcrossTwitter();
 
 		renewNotificationsObserver();
 	}
