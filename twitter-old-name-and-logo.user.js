@@ -4,7 +4,7 @@
 // @name:nl        Twitter: oude naam en logo terugbrengen
 // @name:es        Twitter: recupera el nombre y el logotipo antiguos
 // @namespace      https://github.com/rybak
-// @version        27
+// @version        27.1
 // @description    Changes the logo, tab name, and naming of "tweets" on Twitter
 // @description:de Ändert das Logo, den Tab-Namen und die Benennung von „Tweets“ auf Twitter
 // @description:nl Wijzigt het logo, de tabbladnaam en de naamgeving van "tweets" op Twitter
@@ -14,7 +14,6 @@
 // @match          https://twitter.com/*
 // @icon           https://abs.twimg.com/favicons/twitter.2.ico
 // @grant          GM_addStyle
-// @require        https://cdn.jsdelivr.net/gh/rybak/userscript-libs@e86c722f2c9cc2a96298c8511028f15c45180185/waitForElement.js
 // @run-at         document-body
 // ==/UserScript==
 
@@ -86,6 +85,57 @@
 
 	function debug(...toLog) {
 		console.debug(LOG_PREFIX, ...toLog);
+	}
+
+	const waitingObservers = new Map();
+
+	class Ignorer {
+		#selector;
+
+		constructor(selector) {
+			this.#selector = selector;
+		}
+
+		then() {
+			// warn("Ignoring " + this.#selector);
+		}
+	}
+
+	function uniqueWaitForElement(selector, needReplacing) {
+		const oldObserver = waitingObservers.get(selector);
+		if (oldObserver) {
+			if (!needReplacing) {
+				return new Ignorer(selector);
+			} else {
+				warn("Replaced waiting observer for ", selector);
+				oldObserver.disconnect();
+				waitingObservers.delete(selector);
+			}
+		}
+		return new Promise(resolve => {
+			const queryResult = document.querySelector(selector);
+			if (queryResult) {
+				return resolve(queryResult);
+			}
+			const observer = new MutationObserver(mutations => {
+				const queryResult = document.querySelector(selector);
+				if (queryResult) {
+					/*
+					 * Disconnect first, just in case the listeners
+					 * on the returned Promise trigger the observer
+					 * again.
+					 */
+					observer.disconnect();
+					waitingObservers.delete(selector);
+					resolve(queryResult);
+				}
+			});
+			waitingObservers.set(selector, observer);
+			observer.observe(document.body, {
+				childList: true,
+				subtree: true
+			});
+		});
 	}
 
 	/*
@@ -201,7 +251,7 @@
 		}
 		return;
 		*/
-		waitForElement(POSTS_SELECTOR).then(postsElement => {
+		uniqueWaitForElement(POSTS_SELECTOR).then(postsElement => {
 			try {
 				const s = postsElement.innerText;
 				if (s.includes('tweets')) {
@@ -224,7 +274,7 @@
 	}
 
 	function renameNavTabTweets() {
-		waitForElement('main nav [data-testid="ScrollSnap-List"] > div:first-child span').then(tweetsTabName => {
+		uniqueWaitForElement('main nav [data-testid="ScrollSnap-List"] > div:first-child span').then(tweetsTabName => {
 			if (tweetsTabName.innerText == "Posts") {
 				tweetsTabName.innerHTML = "Tweets";
 			}
@@ -261,13 +311,13 @@
 	 * Renames various oval blue buttons used to send a tweet, i.e. "to tweet".
 	 */
 	function renameTweetButton() {
-		waitForElement('a[data-testid="SideNav_NewTweet_Button"] > div > span > div > div > span > span').then(tweetButton => {
+		uniqueWaitForElement('a[data-testid="SideNav_NewTweet_Button"] > div > span > div > div > span > span').then(tweetButton => {
 			if (tweetButton.innerText == "Post") { // avoid renaming "Reply"
 				tweetButton.innerHTML = "Tweet";
 				debug("SideNav", tweetButton);
 			}
 		});
-		waitForElement(DIALOG_TWEET_BUTTON_SELECTOR).then(tweetButton => {
+		uniqueWaitForElement(DIALOG_TWEET_BUTTON_SELECTOR).then(tweetButton => {
 			tweetButton.innerHTML = "Tweet";
 			if (tweetButtonObserver != null) {
 				return;
@@ -292,7 +342,7 @@
 			info("Connected tweetButtonObserver");
 			dialogObserver.observe(document.body, { childList: true, subtree: true });
 		});
-		waitForElement('div[data-testid="tweetButtonInline"] > div > span > span').then(tweetButton => {
+		uniqueWaitForElement('div[data-testid="tweetButtonInline"] > div > span > span').then(tweetButton => {
 			// sometimes this button has the correct text "Reply"
 			if (tweetButton.innerText == "Post") {
 				debug("tweetButtonInline", tweetButton);
@@ -305,7 +355,7 @@
 	 * Renames counter of retweets on an individual tweet's page.
 	 */
 	function renameRetweetsCounter() {
-		waitForElement('a[href$="/retweets"] > span > span').then(retweetsCounterElement => {
+		uniqueWaitForElement('a[href$="/retweets"] > span > span').then(retweetsCounterElement => {
 			retweetsCounterElement.innerHTML = "Retweets";
 		});
 	}
@@ -316,7 +366,7 @@
 	 *     https://danieljmitchell.wordpress.com/2020/12/29/2020s-tweet-of-the-year/
 	 */
 	function renameQuoteTweetsCounter() {
-		waitForElement('a[href$="/retweets/with_comments"] > span > span').then(retweetsCounterElement => {
+		uniqueWaitForElement('a[href$="/retweets/with_comments"] > span > span').then(retweetsCounterElement => {
 			retweetsCounterElement.innerHTML = "Quote Tweets";
 		});
 	}
@@ -325,7 +375,7 @@
 	 * Renames "Add another tweet" button (for continuing your own existing thread).
 	 */
 	function renameAddAnotherTweetButton() {
-		waitForElement('main section .css-901oao.css-16my406.css-1hf3ou5.r-poiln3.r-1b43r93.r-1cwl3u0.r-bcqeeo.r-qvutc0 .css-901oao.css-16my406.r-poiln3.r-bcqeeo.r-qvutc0').then(addAnotherTweetButton => {
+		uniqueWaitForElement('main section .css-901oao.css-16my406.css-1hf3ou5.r-poiln3.r-1b43r93.r-1cwl3u0.r-bcqeeo.r-qvutc0 .css-901oao.css-16my406.r-poiln3.r-bcqeeo.r-qvutc0').then(addAnotherTweetButton => {
 			if (addAnotherTweetButton.innerText == "Add another post") {
 				addAnotherTweetButton.innerHTML = "Add another tweet";
 			}
@@ -339,7 +389,7 @@
 		/*
 		 * Using selector `#layers h2 ...` works on desktop, but doesn't work on mobile.
 		 */
-		waitForElement('h2 > .css-901oao.css-16my406.r-poiln3.r-bcqeeo.r-qvutc0').then(tweetHeader => {
+		uniqueWaitForElement('h2 > .css-901oao.css-16my406.r-poiln3.r-bcqeeo.r-qvutc0').then(tweetHeader => {
 			if (tweetHeader.innerText == "Post") {
 				tweetHeader.innerHTML = "Tweet";
 			} else if (tweetHeader.innerText == "Reposted by") {
@@ -359,11 +409,15 @@
 	/*
 	 * Note: works only for desktop.
 	 */
-	function renameDraftEditorPlaceholder(targetText, replacementText, debugMessage) {
-		waitForElement('.public-DraftEditorPlaceholder-inner').then(placeholder => {
-			if (placeholder.innerText == targetText) {
-				placeholder.innerHTML = replacementText;
-				debug("Renamed placeholder in", debugMessage);
+	function renameDraftEditorPlaceholder(argss) {
+		uniqueWaitForElement('.public-DraftEditorPlaceholder-inner').then(placeholder => {
+			for (const args of argss) {
+				const targetText = args[0], replacementText = args[1], debugMessage = args[2];
+				if (placeholder.innerText == targetText) {
+					placeholder.replaceChildren(document.createTextNode(replacementText));
+					debug("Renamed placeholder in", debugMessage);
+					break;
+				}
 			}
 		});
 	}
@@ -371,29 +425,26 @@
 	/*
 	 * Note: works only for mobile.
 	 */
-	function renameTextAreaAttributePlaceholder(targetText, replacementText) {
-		waitForElement(`textarea[placeholder="${targetText}"]`).then(textarea => {
-			textarea.setAttribute('placeholder', replacementText);
-		});
+	function renameTextAreaAttributePlaceholder(argss) {
+		for (const args of argss) {
+			const targetText = args[0], replacementText = args[1];
+			uniqueWaitForElement(`textarea[placeholder="${targetText}"]`).then(textarea => {
+				textarea.setAttribute('placeholder', replacementText);
+			});
+		}
 	}
 
-	/*
-	 * Renames a given placeholder `targetText` with `replacementText`.
-	 * Works both on desktop (inline and popup dialogs) and on mobile.
-	 */
-	function renameTweetPlaceholders(targetText, replacementText, debugMessage) {
-		// desktop
-		renameDraftEditorPlaceholder(targetText, replacementText, debugMessage);
-		// mobile
-		renameTextAreaAttributePlaceholder(targetText, replacementText);
+	function renameTweetPlaceholders() {
+		const argss = [
+			["Post your reply!", "Tweet your reply!", "renameTweetYourReplyPlaceholder 1"],
+			["Post your reply", "Tweet your reply", "renameTweetYourReplyPlaceholder 2"],
+			["Add another post!", "Add another tweet!", "renameAddAnotherTweetPlaceholder"]
+		];
+		renameDraftEditorPlaceholder(argss);
+		renameTextAreaAttributePlaceholder(argss);
 		/*
 		 * TODO: is there some way to detect desktop vs mobile?
 		 */
-	}
-
-	function renameTweetYourReplyPlaceholder() {
-		renameTweetPlaceholders("Post your reply!", "Tweet your reply!", "renameTweetYourReplyPlaceholder 1");
-		renameTweetPlaceholders("Post your reply", "Tweet your reply", "renameTweetYourReplyPlaceholder 2");
 	}
 
 	function doRenameRetweeted() {
@@ -430,7 +481,7 @@
 	 * appear in the document.
 	 */
 	function renameRetweetedGently() {
-		waitForElement(RETWEETED_SELECTOR).then(ignored => {
+		uniqueWaitForElement(RETWEETED_SELECTOR).then(ignored => {
 			doRenameRetweeted();
 		});
 	}
@@ -481,7 +532,7 @@
 		 *
 		 * We wait for the <section> that the user sees to appear.
 		 */
-		waitForElement('main [data-testid="primaryColumn"] section.css-1dbjc4n').then(timeline => {
+		uniqueWaitForElement('main [data-testid="primaryColumn"] section.css-1dbjc4n').then(timeline => {
 			if (timelineObserver != null) {
 				timelineObserver.disconnect();
 				timelineObserver = null;
@@ -507,7 +558,7 @@
 	}
 
 	function renameRetweetLink() {
-		waitForElement('[data-testid="retweetConfirm"] span.css-901oao.css-16my406.r-poiln3.r-bcqeeo.r-qvutc0').then(retweetLink => {
+		uniqueWaitForElement('[data-testid="retweetConfirm"] span.css-901oao.css-16my406.r-poiln3.r-bcqeeo.r-qvutc0').then(retweetLink => {
 			/*
 			 * TODO: on desktop, this gets called twice, unfortunately.
 			 */
@@ -519,7 +570,7 @@
 	}
 
 	function renameRetweetTooltip() {
-		waitForElement('[data-testid="HoverLabel"] span').then(retweetTooltip => {
+		uniqueWaitForElement('[data-testid="HoverLabel"] span').then(retweetTooltip => {
 			if (retweetTooltip.innerText == "Repost") {
 				retweetTooltip.innerText = "Retweet";
 				debug("Renamed 'Retweet' in renameRetweetTooltip");
@@ -539,7 +590,7 @@
 	function renameDropdownItems() {
 		// Desktop: [data-testid="Dropdown"]
 		// Mobile : [data-testid="sheetDialog"]
-		waitForElement('#layers [role="menu"]').then(dropdown => {
+		uniqueWaitForElement('#layers [role="menu"]').then(dropdown => {
 			/*
 			 * TODO: on desktop, this gets called twice, unfortunately.
 			 */
@@ -552,12 +603,8 @@
 		});
 	}
 
-	function renameAddAnotherTweetPlaceholder() {
-		renameTweetPlaceholders("Add another post!", "Add another tweet!", "renameAddAnotherTweetPlaceholder");
-	}
-
 	function renameRetweetedByPopupHeader() {
-		waitForElement('#layers h2 > .css-901oao.css-16my406.r-poiln3.r-bcqeeo.r-qvutc0').then(tweetHeader => {
+		uniqueWaitForElement('#layers h2 > .css-901oao.css-16my406.r-poiln3.r-bcqeeo.r-qvutc0').then(tweetHeader => {
 			if (tweetHeader.innerText == "Reposted by") {
 				tweetHeader.innerHTML = "Retweeted by";
 			}
@@ -592,7 +639,7 @@
 	 * popup replies (as opposed to inline replies) are shown.
 	 */
 	function renewLayersObserver() {
-		waitForElement('#layers').then(retweetDropdownContainer => {
+		uniqueWaitForElement('#layers').then(retweetDropdownContainer => {
 			if (layersObserver != null) {
 				layersObserver.disconnect();
 				layersObserver = null;
@@ -604,12 +651,8 @@
 				renameDropdownItems();
 				/*
 				 * There are both inline and popup "Reply" fields with placeholders.
-				 * This call to renameTweetYourReplyPlaceholder() takes care of the popups.
-				 * The call to renameTweetYourReplyPlaceholder() in rename()
-				 * takes care of the inline "Reply" fields.
 				 */
-				renameTweetYourReplyPlaceholder();
-				renameAddAnotherTweetPlaceholder();
+				renameTweetPlaceholders();
 				doRenameDialogTweetButton();
 				renameRetweetedByPopupHeader();
 				doRenameYourTweetWasSent();
@@ -628,7 +671,7 @@
 		 *   - "X, Y, Z tweeted"
 		 *   - "See new tweets"
 		 */
-		waitForElement('[data-testid="pillLabel"] span span span.css-901oao.css-16my406.r-poiln3.r-bcqeeo.r-qvutc0').then(pill => {
+		uniqueWaitForElement('[data-testid="pillLabel"] span span span.css-901oao.css-16my406.r-poiln3.r-bcqeeo.r-qvutc0').then(pill => {
 			if (pill.innerText == "posted") {
 				if (pillObserver != null) {
 					pillObserver.disconnect();
@@ -685,7 +728,7 @@
 			}
 			return;
 		}
-		waitForElement('[aria-label="Timeline: Notifications"]').then(notificationsContainer => {
+		uniqueWaitForElement('[aria-label="Timeline: Notifications"]').then(notificationsContainer => {
 			notificationsObserver = new MutationObserver(mutationsList => {
 				renameTweetInNotifications();
 			});
@@ -718,18 +761,18 @@
 	function renameHiddenTweets() {
 		// Weird selectors because don't know how to wait for replies.
 		// First selector - for hidden quoted tweet at the top of the thread.
-		waitForElement('main section > div > div > div[data-testid="cellInnerDiv"]:nth-child(2)').then(() => {
+		uniqueWaitForElement('main section > div > div > div[data-testid="cellInnerDiv"]:nth-child(2)').then(() => {
 			doRenameHiddenTweets();
 		});
 		// Second selector - for hidden tweets in replies.
-		waitForElement('main section > div > div > div[data-testid="cellInnerDiv"] > .r-qklmqi.r-1adg3ll').then(() => {
+		uniqueWaitForElement('main section > div > div > div[data-testid="cellInnerDiv"] > .r-qklmqi.r-1adg3ll').then(() => {
 			doRenameHiddenTweets();
 		});
 	}
 
 	function renameTranslateTweet() {
 		const translateButtonSelector = 'section > div > div > div[data-testid="cellInnerDiv"] div[role="button"] span.css-901oao.css-16my406.r-poiln3.r-bcqeeo.r-qvutc0';
-		waitForElement(translateButtonSelector).then(button => {
+		uniqueWaitForElement(translateButtonSelector).then(button => {
 			const spanNodes = document.querySelectorAll(translateButtonSelector);
 			spanNodes.forEach(spanNode => {
 				if (spanNode.innerText.includes("post")) {
@@ -741,7 +784,7 @@
 
 	function renameSourcedFromAcrossTwitter() {
 		const selector = 'section > div > div > div[data-testid="cellInnerDiv"] > div > div > div > div > span';
-		waitForElement(selector).then(subheading => {
+		uniqueWaitForElement(selector).then(subheading => {
 			info("renameSourcedFromAcrossTwitter", subheading, subheading.innerText);
 			if (subheading.innerText == "Sourced from across X") {
 				subheading.replaceChildren(document.createTextNode("Sourced from across Twitter"));
@@ -773,7 +816,7 @@
 		renameTweetHeader();
 		renameRetweetsCounter();
 		renameQuoteTweetsCounter();
-		renameTweetYourReplyPlaceholder();
+		renameTweetPlaceholders();
 		renameTranslateTweet();
 
 		// targets for renaming on a user's profile
@@ -807,7 +850,7 @@
 				}
 			}
 		});
-		waitForElement('title').then(elem => {
+		uniqueWaitForElement('title').then(elem => {
 			titleObserver.observe(elem, { subtree: true, characterData: true, childList: true });
 		});
 		rename();
@@ -815,7 +858,7 @@
 
 	replaceLogo();
 	rename();
-	waitForElement(FAVICON_SELECTOR).then(ignored => {
+	uniqueWaitForElement(FAVICON_SELECTOR).then(ignored => {
 		setFavicon(TWITTER_2012_ICON_URL);
 		setUpRenamer();
 	});
