@@ -4,7 +4,7 @@
 // @name:nl        Twitter: oude naam en logo terugbrengen
 // @name:es        Twitter: recupera el nombre y el logotipo antiguos
 // @namespace      https://github.com/rybak
-// @version        27.1
+// @version        27.2
 // @description    Changes the logo, tab name, and naming of "tweets" on Twitter
 // @description:de Ändert das Logo, den Tab-Namen und die Benennung von „Tweets“ auf Twitter
 // @description:nl Wijzigt het logo, de tabbladnaam en de naamgeving van "tweets" op Twitter
@@ -438,7 +438,8 @@
 		const argss = [
 			["Post your reply!", "Tweet your reply!", "renameTweetYourReplyPlaceholder 1"],
 			["Post your reply", "Tweet your reply", "renameTweetYourReplyPlaceholder 2"],
-			["Add another post!", "Add another tweet!", "renameAddAnotherTweetPlaceholder"]
+			["Add another post!", "Add another tweet!", "renameAddAnotherTweetPlaceholder 1"],
+			["Add another post", "Add another tweet", "renameAddAnotherTweetPlaceholder 2"]
 		];
 		renameDraftEditorPlaceholder(argss);
 		renameTextAreaAttributePlaceholder(argss);
