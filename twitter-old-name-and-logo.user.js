@@ -4,7 +4,7 @@
 // @name:nl        Twitter: oude naam en logo terugbrengen
 // @name:es        Twitter: recupera el nombre y el logotipo antiguos
 // @namespace      https://github.com/rybak
-// @version        27.2
+// @version        27.3
 // @description    Changes the logo, tab name, and naming of "tweets" on Twitter
 // @description:de Ändert das Logo, den Tab-Namen und die Benennung von „Tweets“ auf Twitter
 // @description:nl Wijzigt het logo, de tabbladnaam en de naamgeving van "tweets" op Twitter
@@ -144,23 +144,10 @@
 	 * By "theme" I mean "More > Settings and Support > Display > Background".
 	 */
 	function createPostsSelector() {
-		// "Lights out" = dark theme
-		// const darkThemeSelector   = '.css-901oao.css-1hf3ou5.r-1bwzh9t.r-37j5jr.r-n6v787.r-16dba41.r-1cwl3u0.r-bcqeeo.r-qvutc0';
-		// const dimThemeSelector    = '.css-901oao.css-1hf3ou5.r-115tad6.r-37j5jr.r-n6v787.r-16dba41.r-1cwl3u0.r-bcqeeo.r-qvutc0';
-		// "Default" = light theme
-		// const lightThemeSelector  = '.css-901oao.css-1hf3ou5.r-14j79pv.r-37j5jr.r-n6v787.r-16dba41.r-1cwl3u0.r-bcqeeo.r-qvutc0';
-		//                                                     ^^^^^^^^^^
 		// <h2> tag = user's name in the header, right above the tweet counter
-		const commonDesktopSelector = 'h2 + .css-901oao.css-1hf3ou5.r-37j5jr.r-n6v787.r-16dba41.r-1cwl3u0.r-bcqeeo.r-qvutc0';
-
-		// const fakeMobileSelector = '.css-901oao.css-1hf3ou5.r-1bwzh9t.r-37j5jr.r-n6v787.r-16dba41.r-1cwl3u0.r-bcqeeo.r-qvutc0'; // "Lights out" in mobile emulation in desktop browser
-		// const darkMobileSelector = '.css-901oao.css-1hf3ou5.r-1bwzh9t.r-37j5jr.r-1b43r93.r-16dba41.r-14yzgew.r-bcqeeo.r-qvutc0'; // "Lights out" from Firefox Android
-		// const  dimMobileSelector = '.css-901oao.css-1hf3ou5.r-115tad6.r-37j5jr.r-1b43r93.r-16dba41.r-14yzgew.r-bcqeeo.r-qvutc0'; // "Dim" from Firefox Android
-		// const liteMobileSelector = '.css-901oao.css-1hf3ou5.r-14j79pv.r-37j5jr.r-1b43r93.r-16dba41.r-14yzgew.r-bcqeeo.r-qvutc0'; // "Default" from Firefox Android
-		//                                                    ^^^^^^^^^^         ^^^^^^^^^
-
+		const commonDesktopSelector = 'h2 + .css-1rynq56.r-dnmrzs.r-1udh08x.r-3s2u2q.r-bcqeeo.r-qvutc0.r-37j5jr.r-n6v787.r-1cwl3u0.r-16dba41';
+		// mobile selector wasn't updated in v27.3
 		const commonMobileSelector = '.css-901oao.css-1hf3ou5.r-37j5jr.r-1b43r93.r-16dba41.r-14yzgew.r-bcqeeo.r-qvutc0';
-
 		return `${commonDesktopSelector}, ${commonMobileSelector}`;
 	}
 
@@ -389,7 +376,7 @@
 		/*
 		 * Using selector `#layers h2 ...` works on desktop, but doesn't work on mobile.
 		 */
-		uniqueWaitForElement('h2 > .css-901oao.css-16my406.r-poiln3.r-bcqeeo.r-qvutc0').then(tweetHeader => {
+		uniqueWaitForElement('h2 > .css-1qaijid.r-bcqeeo.r-qvutc0.r-poiln3').then(tweetHeader => {
 			if (tweetHeader.innerText == "Post") {
 				tweetHeader.innerHTML = "Tweet";
 			} else if (tweetHeader.innerText == "Reposted by") {
@@ -533,7 +520,7 @@
 		 *
 		 * We wait for the <section> that the user sees to appear.
 		 */
-		uniqueWaitForElement('main [data-testid="primaryColumn"] section.css-1dbjc4n').then(timeline => {
+		uniqueWaitForElement('main [data-testid="primaryColumn"] section.css-175oi2r').then(timeline => {
 			if (timelineObserver != null) {
 				timelineObserver.disconnect();
 				timelineObserver = null;
@@ -595,7 +582,7 @@
 			/*
 			 * TODO: on desktop, this gets called twice, unfortunately.
 			 */
-			dropdown.querySelectorAll('span.css-901oao.css-16my406.r-poiln3.r-bcqeeo.r-qvutc0').forEach(span => {
+			dropdown.querySelectorAll('.css-1rynq56.r-bcqeeo.r-qvutc0.r-37j5jr.r-a023e6.r-rjixqe.r-b88u0q > span.css-1qaijid.r-bcqeeo.r-qvutc0.r-poiln3').forEach(span => {
 				if (span.innerText.includes("post")) {
 					span.innerHTML = span.innerText.replace("post", "tweet");
 					debug("Renamed 'tweet' in renameDropdownItems");
@@ -706,7 +693,7 @@
 		/*
 		 * This mess of a selector tries to minimize the amount of `spanNodes` that match.
 		 */
-		const spanNodes = document.querySelectorAll('article div.css-901oao.r-1nao33i.r-37j5jr.r-a023e6.r-16dba41.r-rjixqe.r-bcqeeo.r-1udh08x.r-qvutc0 span span.css-901oao.css-16my406.r-poiln3.r-bcqeeo.r-qvutc0');
+		const spanNodes = document.querySelectorAll('article div.css-1rynq56.r-bcqeeo.r-qvutc0.r-37j5jr.r-a023e6.r-rjixqe.r-16dba41.r-1udh08x span span.css-1qaijid.r-bcqeeo.r-qvutc0.r-poiln3');
 		spanNodes.forEach(spanNode => {
 			if (spanNode.innerText.includes("post") || spanNode.innerText.includes("Post")) {
 				let s = spanNode.innerText;
@@ -746,7 +733,7 @@
 	 * "This Tweet is from an account that no longer exists."
 	 */
 	function doRenameHiddenTweets() {
-		const spanNodes = document.querySelectorAll('section article span > span > span.css-901oao.css-16my406.r-poiln3.r-bcqeeo.r-qvutc0');
+		const spanNodes = document.querySelectorAll('section article span > span > span.css-1qaijid.r-bcqeeo.r-qvutc0.r-poiln3');
 		spanNodes.forEach(spanNode => {
 			if (spanNode.innerText.includes("post") || spanNode.innerText.includes("Post")) {
 				let s = spanNode.innerText;
@@ -772,7 +759,7 @@
 	}
 
 	function renameTranslateTweet() {
-		const translateButtonSelector = 'section > div > div > div[data-testid="cellInnerDiv"] div[role="button"] span.css-901oao.css-16my406.r-poiln3.r-bcqeeo.r-qvutc0';
+		const translateButtonSelector = 'section > div > div > div[data-testid="cellInnerDiv"] div[role="button"] span.css-1qaijid.r-bcqeeo.r-qvutc0.r-poiln3';
 		uniqueWaitForElement(translateButtonSelector).then(button => {
 			const spanNodes = document.querySelectorAll(translateButtonSelector);
 			spanNodes.forEach(spanNode => {
