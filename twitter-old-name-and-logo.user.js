@@ -69,7 +69,7 @@
 	const POSTS_SELECTOR = createPostsSelector();
 	const DIALOG_TWEET_BUTTON_SELECTOR = 'div[data-testid="tweetButton"] > div > span > span';
 	const RETWEETED_SELECTOR = '[data-testid="socialContext"]';
-	const SHOW_N_TWEETS_SELECTOR = 'main div div section > div > div > div > div div[role="button"] > .css-1dbjc4n.r-16y2uox.r-1wbh5a2.r-1777fci > div > span';
+	const SHOW_N_TWEETS_SELECTOR = 'main div div section > div > div > div > div button[role="button"] > div > div > span';
 
 	function error(...toLog) {
 		console.error(LOG_PREFIX, ...toLog);
