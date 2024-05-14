@@ -4,7 +4,7 @@
 // @name:nl        Twitter: oude naam en logo terugbrengen
 // @name:es        Twitter: recupera el nombre y el logotipo antiguos
 // @namespace      https://github.com/rybak
-// @version        27.4
+// @version        28
 // @description    Changes the logo, tab name, and naming of "tweets" on Twitter
 // @description:de Ändert das Logo, den Tab-Namen und die Benennung von „Tweets“ auf Twitter
 // @description:nl Wijzigt het logo, de tabbladnaam en de naamgeving van "tweets" op Twitter
@@ -336,6 +336,16 @@
 				tweetButton.innerHTML = "Tweet";
 			}
 		});
+
+		if (document.location.pathname == '/home') {
+			// button near the text input at the top of the home page
+			uniqueWaitForElement('main > div > div > div > div > div > div > div > div > div > div > div > div > div > div > div > div > div > div > button > div > span > span').then(tweetButton => {
+				if (tweetButton.innerText == "Post") {
+					debug("topOfHomePageTweetButton", tweetButton);
+					tweetButton.innerHTML = "Tweet";
+				}
+			});
+		}
 	}
 
 	/*
