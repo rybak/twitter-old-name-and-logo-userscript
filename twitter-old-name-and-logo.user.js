@@ -537,8 +537,11 @@
 			/*
 			 * And we observe all <section> tags:
 			 */
-			const allSections = document.querySelectorAll('main section.css-1dbjc4n');
+			const allSections = document.querySelectorAll('main section.css-175oi2r');
 			info("Renewing timeline observer for", allSections.length, "tags");
+			if (allSections.length == 0) {
+				error("Cannot find the timeline <section> tag");
+			}
 			for (const section of allSections) {
 				timelineObserver.observe(section, { subtree: true, childList: true, characterData: true });
 				info("Added timeline observer", section);
