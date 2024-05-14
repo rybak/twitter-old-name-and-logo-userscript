@@ -437,6 +437,7 @@
 
 	function doRenameRetweeted() {
 		const allRetweeted = document.querySelectorAll(RETWEETED_SELECTOR);
+		debug(`doRenameRetweeted: renaming ${allRetweeted.length} of "... reposted" to "... retweeted"`);
 		let counter = 0;
 		for (const retweeted of allRetweeted) {
 			if (retweeted.childNodes.length == 1) {
@@ -448,10 +449,11 @@
 				}
 				continue;
 			}
-			if (retweeted.childNodes.length < 3) {
+			// debug(retweeted.childNodes);
+			if (retweeted.childNodes.length < 2) {
 				continue;
 			}
-			const retweetedText = retweeted.childNodes[2];
+			const retweetedText = retweeted.childNodes[1];
 			if (retweetedText.textContent === " reposted") {
 				retweetedText.remove();
 				retweeted.append(" retweeted");
