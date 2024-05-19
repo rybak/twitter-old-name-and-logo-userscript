@@ -542,6 +542,10 @@
 				timelineObserver = null;
 				info("Disconnected timeline observer");
 			}
+			if (document.querySelector('main [data-testid="primaryColumn"] nav') == null) {
+				info('renewTimelineObserver: Not on a timeline view. Aborting.');
+				return;
+			}
 			renameRetweetedGently();
 			renameShowTweets();
 			timelineObserver = new MutationObserver(mutationsList => {
