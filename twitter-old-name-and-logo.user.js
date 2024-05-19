@@ -605,7 +605,7 @@
 			/*
 			 * TODO: on desktop, this gets called twice, unfortunately.
 			 */
-			dropdown.querySelectorAll('.css-1rynq56.r-bcqeeo.r-qvutc0.r-37j5jr.r-a023e6.r-rjixqe.r-b88u0q > span.css-1qaijid.r-bcqeeo.r-qvutc0.r-poiln3').forEach(span => {
+			dropdown.querySelectorAll('[role="menuitem"] span').forEach(span => {
 				if (span.innerText.includes("post")) {
 					span.innerHTML = span.innerText.replace("post", "tweet");
 					debug("Renamed 'tweet' in renameDropdownItems");
