@@ -453,6 +453,9 @@
 		for (const retweeted of allRetweeted) {
 			if (retweeted.childNodes.length == 1) {
 				const inner = retweeted.childNodes[0];
+				if (inner.childNodes.length < 1) {
+					continue;
+				}
 				if (inner.childNodes[0].textContent === "You reposted") {
 					inner.childNodes[0].remove();
 					inner.append("You retweeted");
