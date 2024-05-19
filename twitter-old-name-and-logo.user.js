@@ -4,7 +4,7 @@
 // @name:nl        Twitter: oude naam en logo terugbrengen
 // @name:es        Twitter: recupera el nombre y el logotipo antiguos
 // @namespace      https://github.com/rybak
-// @version        29
+// @version        29.1
 // @description    Changes the logo, tab name, and naming of "tweets" on Twitter
 // @description:de Ändert das Logo, den Tab-Namen und die Benennung von „Tweets“ auf Twitter
 // @description:nl Wijzigt het logo, de tabbladnaam en de naamgeving van "tweets" op Twitter
@@ -19,7 +19,7 @@
 // ==/UserScript==
 
 /*
- * Copyright (c) 2023 Andrei Rybak
+ * Copyright (c) 2023-2024 Andrei Rybak
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -387,7 +387,7 @@
 		/*
 		 * Using selector `#layers h2 ...` works on desktop, but doesn't work on mobile.
 		 */
-		uniqueWaitForElement('h2 > .css-1qaijid.r-bcqeeo.r-qvutc0.r-poiln3').then(tweetHeader => {
+		uniqueWaitForElement('main div[data-testid="primaryColumn"] h2 span').then(tweetHeader => {
 			if (tweetHeader.innerText == "Post") {
 				tweetHeader.innerHTML = "Tweet";
 			} else if (tweetHeader.innerText == "Reposted by") {
