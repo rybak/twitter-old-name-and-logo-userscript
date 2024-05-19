@@ -228,8 +228,8 @@
 	 * Replaces text "123 posts" with "123 tweets" on user profile pages.
 	 */
 	function renameProfileTweetsCounter() {
-		/*
 		// Debug code for figuring out CSS selectors for mobile version
+		/*
 		const allDivs = document.querySelectorAll('div');
 		for (const div of allDivs) {
 			if (div.innerHTML.endsWith('posts')) {
