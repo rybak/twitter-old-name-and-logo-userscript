@@ -67,7 +67,6 @@
 
 	const LOG_PREFIX = "[old school Twitter]";
 	const FAVICON_SELECTOR = 'link[rel="icon"], link[rel="shortcut icon"]';
-	const POSTS_SELECTOR = createPostsSelector();
 	const DIALOG_TWEET_BUTTON_SELECTOR = 'div[data-testid="tweetButton"] > div > span > span';
 	const RETWEETED_SELECTOR = '[data-testid="socialContext"]';
 	const SHOW_N_TWEETS_SELECTOR = 'main div div section > div > div > div > div button[role="button"] > div > div > span';
@@ -137,19 +136,6 @@
 				subtree: true
 			});
 		});
-	}
-
-	/*
-	 * Tweets/Posts counters in user profiles are weird.  Their nesting/wrapping
-	 * depends on the theme and on mobile vs desktop.
-	 * By "theme" I mean "More > Settings and Support > Display > Background".
-	 */
-	function createPostsSelector() {
-		// <h2> tag = user's name in the header, right above the tweet counter
-		const commonDesktopSelector = 'h2 + .css-1rynq56.r-dnmrzs.r-1udh08x.r-3s2u2q.r-bcqeeo.r-qvutc0.r-37j5jr.r-n6v787.r-1cwl3u0.r-16dba41';
-		// mobile selector wasn't updated in v27.3
-		const commonMobileSelector = '.css-901oao.css-1hf3ou5.r-37j5jr.r-1b43r93.r-16dba41.r-14yzgew.r-bcqeeo.r-qvutc0';
-		return `${commonDesktopSelector}, ${commonMobileSelector}`;
 	}
 
 	function replaceLogoOnLoadingScreen() {
@@ -239,6 +225,16 @@
 		}
 		return;
 		*/
+		/*
+		 * Tweets/Posts counters in user profiles are weird.  Their nesting/wrapping
+		 * depends on the theme and on mobile vs desktop.
+		 * By "theme" I mean "More > Settings and Support > Display > Background".
+		 */
+		// <h2> tag = user's name in the header, right above the tweet counter
+		const commonDesktopSelector = 'h2 + .css-1rynq56.r-dnmrzs.r-1udh08x.r-3s2u2q.r-bcqeeo.r-qvutc0.r-37j5jr.r-n6v787.r-1cwl3u0.r-16dba41';
+		// mobile selector wasn't updated in v27.3
+		const commonMobileSelector = '.css-901oao.css-1hf3ou5.r-37j5jr.r-1b43r93.r-16dba41.r-14yzgew.r-bcqeeo.r-qvutc0';
+		const POSTS_SELECTOR = `${commonDesktopSelector}, ${commonMobileSelector}`;
 		uniqueWaitForElement(POSTS_SELECTOR).then(postsElement => {
 			try {
 				const s = postsElement.innerText;
