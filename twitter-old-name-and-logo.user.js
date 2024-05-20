@@ -4,7 +4,7 @@
 // @name:nl        Twitter: oude naam en logo terugbrengen
 // @name:es        Twitter: recupera el nombre y el logotipo antiguos
 // @namespace      https://github.com/rybak
-// @version        30.2
+// @version        30.3
 // @description    Changes the logo, tab name, and naming of "tweets" on Twitter
 // @description:de Ändert das Logo, den Tab-Namen und die Benennung von „Tweets“ auf Twitter
 // @description:nl Wijzigt het logo, de tabbladnaam en de naamgeving van "tweets" op Twitter
@@ -384,7 +384,7 @@
 	 * Renames "Add another tweet" button (for continuing your own existing thread).
 	 */
 	function renameAddAnotherTweetButton() {
-		uniqueWaitForElement('main section span.css-1qaijid.r-dnmrzs.r-1udh08x.r-3s2u2q.r-bcqeeo.r-qvutc0.r-poiln3.r-1b43r93.r-1cwl3u0 > span.css-1qaijid.r-bcqeeo.r-qvutc0.r-poiln3').then(addAnotherTweetButton => {
+		uniqueWaitForElement('main section > div > div > div > div > div > a[href="/compose/post"] span > span').then(addAnotherTweetButton => {
 			if (addAnotherTweetButton.innerText == "Add another post") {
 				addAnotherTweetButton.innerHTML = "Add another tweet";
 			}
