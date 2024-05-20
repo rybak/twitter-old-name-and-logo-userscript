@@ -4,7 +4,7 @@
 // @name:nl        Twitter: oude naam en logo terugbrengen
 // @name:es        Twitter: recupera el nombre y el logotipo antiguos
 // @namespace      https://github.com/rybak
-// @version        30
+// @version        30.1
 // @description    Changes the logo, tab name, and naming of "tweets" on Twitter
 // @description:de Ändert das Logo, den Tab-Namen und die Benennung von „Tweets“ auf Twitter
 // @description:nl Wijzigt het logo, de tabbladnaam en de naamgeving van "tweets" op Twitter
@@ -727,7 +727,8 @@
 		/*
 		 * This mess of a selector tries to minimize the amount of `spanNodes` that match.
 		 */
-		const spanNodes = document.querySelectorAll('article div.css-1rynq56.r-bcqeeo.r-qvutc0.r-37j5jr.r-a023e6.r-rjixqe.r-16dba41.r-1udh08x span span.css-1qaijid.r-bcqeeo.r-qvutc0.r-poiln3');
+		const spanNodes = document.querySelectorAll('article div > div > div > span > span');
+		debug(`renameTweetInNotifications: renaming ${spanNodes.length} nodes (shouldn't be too high!)`);
 		spanNodes.forEach(spanNode => {
 			if (spanNode.innerText.includes("post") || spanNode.innerText.includes("Post")) {
 				let s = spanNode.innerText;
