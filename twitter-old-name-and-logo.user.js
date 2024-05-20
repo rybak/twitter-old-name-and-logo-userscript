@@ -4,7 +4,7 @@
 // @name:nl        Twitter: oude naam en logo terugbrengen
 // @name:es        Twitter: recupera el nombre y el logotipo antiguos
 // @namespace      https://github.com/rybak
-// @version        29.3
+// @version        29.4
 // @description    Changes the logo, tab name, and naming of "tweets" on Twitter
 // @description:de Ändert das Logo, den Tab-Namen und die Benennung von „Tweets“ auf Twitter
 // @description:nl Wijzigt het logo, de tabbladnaam en de naamgeving van "tweets" op Twitter
@@ -231,8 +231,8 @@
 		 * By "theme" I mean "More > Settings and Support > Display > Background".
 		 */
 		// <h2> tag = user's name in the header, right above the tweet counter
-		const commonDesktopSelector = 'h2 + .css-1rynq56.r-dnmrzs.r-1udh08x.r-3s2u2q.r-bcqeeo.r-qvutc0.r-37j5jr.r-n6v787.r-1cwl3u0.r-16dba41';
-		// mobile selector wasn't updated in v27.3
+		const commonDesktopSelector = 'h2 + div:not(#layers)';
+		// mobile selector wasn't updated in v27.3 and in v29.4
 		const commonMobileSelector = '.css-901oao.css-1hf3ou5.r-37j5jr.r-1b43r93.r-16dba41.r-14yzgew.r-bcqeeo.r-qvutc0';
 		const POSTS_SELECTOR = `${commonDesktopSelector}, ${commonMobileSelector}`;
 		uniqueWaitForElement(POSTS_SELECTOR).then(postsElement => {
