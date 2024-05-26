@@ -4,7 +4,7 @@
 // @name:nl        Twitter: oude naam en logo terugbrengen
 // @name:es        Twitter: recupera el nombre y el logotipo antiguos
 // @namespace      https://github.com/rybak
-// @version        30.4
+// @version        30.5
 // @description    Changes the logo, tab name, and naming of "tweets" on Twitter
 // @description:de Ändert das Logo, den Tab-Namen und die Benennung von „Tweets“ auf Twitter
 // @description:nl Wijzigt het logo, de tabbladnaam en de naamgeving van "tweets" op Twitter
@@ -395,10 +395,7 @@
 	 * Renames the header on a page for a singular tweet.
 	 */
 	function renameTweetHeader() {
-		/*
-		 * Using selector `#layers h2 ...` works on desktop, but doesn't work on mobile.
-		 */
-		uniqueWaitForElement('main div[data-testid="primaryColumn"] h2 span, h2[role="heading"] > span').then(tweetHeader => {
+		uniqueWaitForElement('h2[role="heading"] > span').then(tweetHeader => {
 			if (tweetHeader.innerText == "Post") {
 				tweetHeader.innerHTML = "Tweet";
 			} else if (tweetHeader.innerText == "Reposted by") {
