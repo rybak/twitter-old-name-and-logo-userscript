@@ -4,7 +4,7 @@
 // @name:nl        Twitter: oude naam en logo terugbrengen
 // @name:es        Twitter: recupera el nombre y el logotipo antiguos
 // @namespace      https://github.com/rybak
-// @version        30.6
+// @version        30.7
 // @description    Changes the logo, tab name, and naming of "tweets" on Twitter
 // @description:de Ändert das Logo, den Tab-Namen und die Benennung von „Tweets“ auf Twitter
 // @description:nl Wijzigt het logo, de tabbladnaam en de naamgeving van "tweets" op Twitter
@@ -67,7 +67,7 @@
 
 	const LOG_PREFIX = "[old school Twitter]";
 	const FAVICON_SELECTOR = 'link[rel="icon"], link[rel="shortcut icon"]';
-	const DIALOG_TWEET_BUTTON_SELECTOR = 'div[data-testid="tweetButton"] > div > span > span';
+	const DIALOG_TWEET_BUTTON_SELECTOR = 'button[data-testid="tweetButton"] > div > span > span';
 	const RETWEETED_SELECTOR = '[data-testid="socialContext"]';
 	const SHOW_N_TWEETS_SELECTOR = 'main div div section > div > div > div > div button[role="button"] > div > div > span';
 
@@ -290,11 +290,10 @@
 		}
 		if (newTweetButton.innerText == "Post all") {
 			newTweetButton.innerText = "Tweet all";
-			debug("DIALOG_TWEET_BUTTON_SELECTOR", newTweetButton);
 		} else if (newTweetButton.innerText == "Post") {
 			newTweetButton.innerText = "Tweet";
-			debug("DIALOG_TWEET_BUTTON_SELECTOR", newTweetButton);
 		}
+		debug("DIALOG_TWEET_BUTTON_SELECTOR", newTweetButton);
 	}
 
 	/*
