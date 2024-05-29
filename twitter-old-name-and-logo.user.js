@@ -341,23 +341,15 @@
 			info("Connected tweetButtonObserver");
 			dialogObserver.observe(document.body, { childList: true, subtree: true });
 		});
-		uniqueWaitForElement('div[data-testid="tweetButtonInline"] > div > span > span').then(tweetButton => {
+
+		// button near the text input at the top of the home page
+		uniqueWaitForElement('button[data-testid="tweetButtonInline"] > div > span > span').then(tweetButton => {
 			// sometimes this button has the correct text "Reply"
 			if (tweetButton.innerText == "Post") {
 				debug("tweetButtonInline", tweetButton);
 				tweetButton.innerHTML = "Tweet";
 			}
 		});
-
-		if (document.location.pathname == '/home') {
-			// button near the text input at the top of the home page
-			uniqueWaitForElement('main > div > div > div > div > div > div > div > div > div > div > div > div > div > div > div > div > div > div > button > div > span > span').then(tweetButton => {
-				if (tweetButton.innerText == "Post") {
-					debug("topOfHomePageTweetButton", tweetButton);
-					tweetButton.innerHTML = "Tweet";
-				}
-			});
-		}
 	}
 
 	/*
