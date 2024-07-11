@@ -4,7 +4,7 @@
 // @name:nl        Twitter: oude naam en logo terugbrengen
 // @name:es        Twitter: recupera el nombre y el logotipo antiguos
 // @namespace      https://github.com/rybak
-// @version        30.9
+// @version        30.10
 // @description    Changes the logo, tab name, and naming of "tweets" on Twitter
 // @description:de Ändert das Logo, den Tab-Namen und die Benennung von „Tweets“ auf Twitter
 // @description:nl Wijzigt het logo, de tabbladnaam en de naamgeving van "tweets" op Twitter
@@ -362,22 +362,30 @@
 	}
 
 	/*
-	 * Renames counter of retweets on an individual tweet's page.
+	 * Renames tabs "Retweets" and "Quote Tweets" on an individual tweet's "Tweet engagements" subpage.
+	 * E.g. on https://twitter.com/andrybak0/status/1711154194835554336/retweets
 	 */
-	function renameRetweetsCounter() {
-		uniqueWaitForElement('a[href$="/retweets"] > span > span').then(retweetsCounterElement => {
-			retweetsCounterElement.innerHTML = "Retweets";
+	function renameTweetEngagementsSubpageTabs() {
+		const pathParts = document.location.pathname.split('/');
+		if (pathParts.length < 5) {
+			return;
+		}
+		if (pathParts[2] !== 'status') {
+			return;
+		}
+		if (!['quotes', 'retweets', 'likes'].includes(pathParts[4])) {
+			return;
+		}
+		uniqueWaitForElement('a[href$="/retweets"] span').then(retweetsTabHeader => {
+			retweetsTabHeader.replaceChildren(document.createTextNode("Retweets"));
 		});
-	}
-
-	/*
-	 * Renames counter "Quotes" → "Quote Tweets" on an individual tweet's page.
-	 * A bunch of old screenshots for confirmation:
-	 *     https://danieljmitchell.wordpress.com/2020/12/29/2020s-tweet-of-the-year/
-	 */
-	function renameQuoteTweetsCounter() {
-		uniqueWaitForElement('a[href$="/retweets/with_comments"] > span > span').then(retweetsCounterElement => {
-			retweetsCounterElement.innerHTML = "Quote Tweets";
+		/*
+		 * Renames tab "Quotes" → "Quote Tweets"
+		 * A bunch of old screenshots for confirmation:
+		 *     https://danieljmitchell.wordpress.com/2020/12/29/2020s-tweet-of-the-year/
+		 */
+		uniqueWaitForElement('a[href$="/quotes"] span').then(quotesTabHeader => {
+			quotesTabHeader.replaceChildren(document.createTextNode("Quote Tweets"));
 		});
 	}
 
@@ -829,8 +837,7 @@
 
 		// targets for renaming on a singular tweet page
 		renameTweetHeader();
-		renameRetweetsCounter();
-		renameQuoteTweetsCounter();
+		renameTweetEngagementsSubpageTabs();
 		renameTweetPlaceholders();
 		renameTranslateTweet();
 
