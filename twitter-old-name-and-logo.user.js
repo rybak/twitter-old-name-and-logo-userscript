@@ -227,6 +227,9 @@
 		if (t.startsWith("Posts with ")) {
 			t = t.replace("Post", "Tweet");
 		}
+		if (t.startsWith("Quotes of this post ")) {
+			t = t.replace("Quotes of this post ", "Quotes of this tweet ");
+		}
 		if (t != document.title) {
 			document.title = t;
 		}
