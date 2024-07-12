@@ -4,7 +4,7 @@
 // @name:nl        Twitter: oude naam en logo terugbrengen
 // @name:es        Twitter: recupera el nombre y el logotipo antiguos
 // @namespace      https://github.com/rybak
-// @version        30.10
+// @version        30.11
 // @description    Changes the logo, tab name, and naming of "tweets" on Twitter
 // @description:de Ändert das Logo, den Tab-Namen und die Benennung von „Tweets“ auf Twitter
 // @description:nl Wijzigt het logo, de tabbladnaam en de naamgeving van "tweets" op Twitter
@@ -815,6 +815,14 @@
 		});
 	}
 
+	function isAProfilePage() {
+		const pathParts = document.location.pathname.split('/');
+		if (pathParts.length < 2) {
+			return false;
+		}
+		return document.title.includes("(@" + pathParts[1] + ")");
+	}
+
 	/*
 	 * There are four layers to the userscript:
 	 *
@@ -842,8 +850,10 @@
 		renameTranslateTweet();
 
 		// targets for renaming on a user's profile
-		renameProfileTweetsCounter();
-		renameNavTabTweets();
+		if (isAProfilePage()) {
+			renameProfileTweetsCounter();
+			renameNavTabTweets();
+		}
 
 		// adding to your own thread
 		renameAddAnotherTweetButton();
