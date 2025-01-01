@@ -534,7 +534,7 @@
 		}
 	}
 
-	let timelineObserver;
+	let timelineObserver = null;
 
 	/*
 	 * Reconnects the observer to the timeline node.
@@ -554,7 +554,7 @@
 		 * We wait for the <section> that the user sees to appear.
 		 */
 		uniqueWaitForElement('main [data-testid="primaryColumn"] section.css-175oi2r').then(timeline => {
-			if (timelineObserver != null) {
+			if (timelineObserver !== null) {
 				timelineObserver.disconnect();
 				timelineObserver = null;
 				info("Disconnected timeline observer");
