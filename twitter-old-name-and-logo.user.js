@@ -4,7 +4,7 @@
 // @name:nl        Twitter: oude naam en logo terugbrengen
 // @name:es        Twitter: recupera el nombre y el logotipo antiguos
 // @namespace      https://github.com/rybak
-// @version        30.13
+// @version        30.14
 // @description    Changes the logo, tab name, and naming of "tweets" on Twitter
 // @description:de Ändert das Logo, den Tab-Namen und die Benennung von „Tweets“ auf Twitter
 // @description:nl Wijzigt het logo, de tabbladnaam en de naamgeving van "tweets" op Twitter
@@ -67,7 +67,7 @@
 
 	const LOG_PREFIX = "[old school Twitter]";
 	const FAVICON_SELECTOR = 'link[rel="icon"], link[rel="shortcut icon"]';
-	const DIALOG_TWEET_BUTTON_SELECTOR = 'button[data-testid="tweetButton"] > div > span > span';
+	const DIALOG_TWEET_BUTTON_SELECTOR = 'button[data-testid="tweetButton"] > div span > span';
 	const RETWEETED_SELECTOR = '[data-testid="socialContext"]';
 	const SHOW_N_TWEETS_SELECTOR = 'main div div section > div > div > div > div button[role="button"] > div > div > span';
 
@@ -319,7 +319,7 @@
 	 * Renames various oval blue buttons used to send a tweet, i.e. "to tweet".
 	 */
 	function renameTweetButton() {
-		uniqueWaitForElement('a[data-testid="SideNav_NewTweet_Button"] > div > span > div > div > span > span').then(tweetButton => {
+		uniqueWaitForElement('a[data-testid="SideNav_NewTweet_Button"] div > span > span').then(tweetButton => {
 			if (tweetButton.innerText == "Post") { // avoid renaming "Reply"
 				tweetButton.innerHTML = "Tweet";
 				debug("SideNav", tweetButton);
@@ -352,7 +352,7 @@
 		});
 
 		// button near the text input at the top of the home page
-		uniqueWaitForElement('button[data-testid="tweetButtonInline"] > div > span > span').then(tweetButton => {
+		uniqueWaitForElement('button[data-testid="tweetButtonInline"] > div span > span').then(tweetButton => {
 			// sometimes this button has the correct text "Reply"
 			if (tweetButton.innerText == "Post") {
 				debug("tweetButtonInline", tweetButton);
