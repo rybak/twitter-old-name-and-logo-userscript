@@ -4,7 +4,7 @@
 // @name:nl        Twitter: oude naam en logo terugbrengen
 // @name:es        Twitter: recupera el nombre y el logotipo antiguos
 // @namespace      https://github.com/rybak
-// @version        30.14
+// @version        31
 // @description    Changes the logo, tab name, and naming of "tweets" on Twitter
 // @description:de Ändert das Logo, den Tab-Namen und die Benennung von „Tweets“ auf Twitter
 // @description:nl Wijzigt het logo, de tabbladnaam en de naamgeving van "tweets" op Twitter
@@ -224,7 +224,7 @@
 		if (t.startsWith("Compose new post")) {
 			t = t.replace("Compose new post", "Compose new tweet");
 		}
-		if (t.startsWith("Posts with ")) {
+		if (t.startsWith("Posts ")) {
 			t = t.replace("Post", "Tweet");
 		}
 		if (t.startsWith("Quotes of this post ")) {
@@ -407,6 +407,8 @@
 		uniqueWaitForElement('h2[role="heading"] > span').then(tweetHeader => {
 			if (tweetHeader.innerText == "Post") {
 				tweetHeader.innerHTML = "Tweet";
+			} else if (tweetHeader.innerText == "Posts") {
+				tweetHeader.innerHTML = "Tweets";
 			} else if (tweetHeader.innerText == "Reposted by") {
 				tweetHeader.innerHTML = "Retweeted by";
 			} else if (tweetHeader.innerText == "Quotes") {
@@ -868,7 +870,7 @@
 			if (maybeNewTitle != title) {
 				info('Title changed:', maybeNewTitle);
 				title = maybeNewTitle;
-				if (!title.includes("Twitter") || title.endsWith("/ X")) {
+				if (!title.includes("Twitter") || title.endsWith("/ X") || title.startsWith("Post")) {
 					info("Big renaming: starting...");
 					rename();
 					renewTimelineObserver();
