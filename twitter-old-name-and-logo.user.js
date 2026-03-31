@@ -4,7 +4,7 @@
 // @name:nl        Twitter: oude naam en logo terugbrengen
 // @name:es        Twitter: recupera el nombre y el logotipo antiguos
 // @namespace      https://github.com/rybak
-// @version        31
+// @version        31.1
 // @description    Changes the logo, tab name, and naming of "tweets" on Twitter
 // @description:de Ändert das Logo, den Tab-Namen und die Benennung von „Tweets“ auf Twitter
 // @description:nl Wijzigt het logo, de tabbladnaam en de naamgeving van "tweets" op Twitter
@@ -512,8 +512,8 @@
 	function renameShowTweets() {
 		const showTweetsArray = document.querySelectorAll(SHOW_N_TWEETS_SELECTOR);
 		for (const showTweets of showTweetsArray) {
-			let t = showTweets.childNodes[0].textContent;
-			if (t.includes('posts')) {
+			let t = showTweets.childNodes[0]?.textContent;
+			if (t && t.includes('posts')) {
 				if (showTweetsObserver != null) {
 					showTweetsObserver.disconnect();
 					showTweetsObserver = null;
